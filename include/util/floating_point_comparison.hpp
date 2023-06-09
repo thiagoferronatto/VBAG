@@ -1,0 +1,11 @@
+#ifndef VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_UTIL_FLOATING_POINT_COMPARISON_HPP
+#define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_UTIL_FLOATING_POINT_COMPARISON_HPP
+
+#include <cmath>
+
+template <typename T>
+inline constexpr auto areEqual(T a, T b, T epsilon = T{0.00001F}) {
+  return std::abs(a - b) < epsilon;
+}
+
+#endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_UTIL_FLOATING_POINT_COMPARISON_HPP

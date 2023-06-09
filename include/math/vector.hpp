@@ -11,26 +11,33 @@ template <> struct Vector<float, 3> {
     return x * other.x + y * other.y + z * other.z;
   }
 
-  auto operator+(const Vector &other) const {
+  [[nodiscard]] auto cross(const Vector &other) const {
+    return Vector{y * other.z - z * other.y, z * other.x - x * other.z,
+                  x * other.y - y * other.x};
+  }
+
+  [[nodiscard]] auto operator+(const Vector &other) const {
     return Vector{x + other.x, y + other.y, z + other.z};
   }
 
-  auto operator-(const Vector &other) const {
+  [[nodiscard]] auto operator-(const Vector &other) const {
     return Vector{x - other.x, y - other.y, z - other.z};
   }
 
-  auto operator*(float scalar) const {
+  [[nodiscard]] auto operator*(float scalar) const {
     return Vector{scalar * x, scalar * y, scalar * z};
   }
 
-  friend auto operator*(float scalar, const Vector &v) { return v * scalar; }
+  [[nodiscard]] friend auto operator*(float scalar, const Vector &v) {
+    return v * scalar;
+  }
 
-  auto operator/(float scalar) const {
+  [[nodiscard]] auto operator/(float scalar) const {
     return Vector{x / scalar, y / scalar, z / scalar};
   }
 
   // performs component-wise division. it's useful in some cases.
-  auto operator/(const Vector &other) const {
+  [[nodiscard]] auto operator/(const Vector &other) const {
     return Vector{x / other.x, y / other.y, z / other.z};
   }
 

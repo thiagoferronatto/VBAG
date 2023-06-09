@@ -9,10 +9,15 @@ set(CMAKE_CXX_STANDARD 20)
 include_directories(include)
 
 add_executable(VBAG
-        source/main.cpp
-        include/math/vector.hpp
-        include/math/graph.hpp
-        include/output/screen.hpp
         include/animation/animation_engine.hpp
+        include/data/triplet.hpp
+        include/geometry/graph.hpp
+        include/geometry/mesh.hpp
+        include/graphics/ray.hpp
+        include/math/vector.hpp
+        include/output/screen.hpp
+        include/tests/animation_test.hpp
+        source/animation/animation_engine.cpp
+        source/geometry/mesh.cpp
         source/tests/animation_test.cpp
-        include/tests/animation_test.hpp)
+        source/main.cpp include/util/floating_point_comparison.hpp)
