@@ -97,6 +97,15 @@ Screen &AnimationEngine::screen() { return screen_; }
 
 void AnimationEngine::delay(DWORD milliseconds) { Sleep(milliseconds); }
 
+static constexpr char brightnessChars[]{
+    '`', '.', '-', '\'', ':', '_', ',', '^', '=', ';', '>', '<', '+',
+    '!', 'r', 'c', '*',  '/', 'z', '?', 's', 'L', 'T', 'v', ')', 'J',
+    '7', '(', '|', 'F',  'i', '{', 'C', '}', 'f', 'I', '3', '1', 't',
+    'l', 'u', '[', 'n',  'e', 'o', 'Z', '5', 'Y', 'x', 'j', 'y', 'a',
+    ']', '2', 'E', 'S',  'w', 'q', 'k', 'P', '6', 'h', '9', 'd', '4',
+    'V', 'p', 'O', 'G',  'b', 'U', 'A', 'K', 'X', 'H', 'm', '8', 'R',
+    'D', '#', '$', 'B',  'g', '0', 'M', 'N', 'W', 'Q', '%', '&', '@'};
+
 void AnimationEngine::drawMesh(const Mesh &mesh, float tx, float ty, float tz) {
   for (size_t i{}; i < screen_.height(); ++i) {
     for (size_t j{}; j < screen_.width(); ++j) {
@@ -104,9 +113,19 @@ void AnimationEngine::drawMesh(const Mesh &mesh, float tx, float ty, float tz) {
             float(i) - float(screen_.height()) / 2.0F, 0.0F};
       R3F ray{p, {0, 0, -1}};
       auto [hit, point, normal]{ray.intersection(mesh)};
-      if (hit)
-        screen_.set(i, j, '#');
-      // TODO: apply lighting and add pixel to framebuffer
+      if (!hit)
+        continue;
+      auto ia{0.0F}, oa{0.01F}, od{0.5F}, os{0.5F};
+      // only one light for testing purposes here. TODO: generalize
+      V3F lightPos{0, 10, 0};
+      auto lightColor{0.01F};
+      auto ll{point - lightPos}, rl{ll - 2 * normal.dot(ll) * normal};
+      float diffuseSum{-od * lightColor * normal.dot(ll)},
+          specularSum{os * lightColor * std::pow(rl.dot(point), 2.0F)};
+      auto color{std::min(ia * oa + diffuseSum + specularSum, 1.0F)};
+      auto c{brightnessChars[size_t(color * 90.0F)]};
+      screen_.set(i, j, c);
+      // FIXME: this whole thing is a mess, dude
     }
   }
 }
