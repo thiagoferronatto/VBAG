@@ -121,7 +121,10 @@ void AnimationEngine::drawMesh(const Mesh &mesh, float tx, float ty, float tz) {
       auto lightColor{0.01F};
       auto ll{point - lightPos}, rl{ll - 2 * normal.dot(ll) * normal};
       float diffuseSum{-od * lightColor * normal.dot(ll)},
-          specularSum{os * lightColor * std::pow(rl.dot(point), 2.0F)};
+          specularSum{
+              -os * lightColor *
+              std::pow(rl.dot(point), 2.0F)}; // FIXME: maybe the specular sum
+                                              // isnt negative idk anymore
       auto color{std::min(ia * oa + diffuseSum + specularSum, 1.0F)};
       auto c{brightnessChars[size_t(color * 90.0F)]};
       screen_.set(i, j, c);
