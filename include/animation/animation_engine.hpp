@@ -2,7 +2,6 @@
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_ANIMATION_ANIMATION_ENGINE_HPP
 
 #include "geometry/graph.hpp"
-#include "geometry/mesh.hpp"
 #include "output/screen.hpp"
 
 #include <cmath>

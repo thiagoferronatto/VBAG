@@ -5,7 +5,6 @@
 
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
-#include "geometry/mesh.hpp"
 #include "output/screen.hpp"
 
 void testAnimations() {

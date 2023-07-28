@@ -12,12 +12,10 @@ add_executable(VBAG
         include/animation/animation_engine.hpp
         include/data/triplet.hpp
         include/geometry/graph.hpp
-        include/geometry/mesh.hpp
         include/math/vector.hpp
         include/output/screen.hpp
         include/tests/animation_test.hpp
         source/animation/animation_engine.cpp
-        source/geometry/mesh.cpp
         source/tests/animation_test.cpp
         source/main.cpp include/util/floating_point_comparison.hpp
         include/math/matrix.hpp
