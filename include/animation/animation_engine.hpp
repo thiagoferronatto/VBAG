@@ -3,7 +3,6 @@
 
 #include "geometry/graph.hpp"
 #include "geometry/mesh.hpp"
-#include "graphics/ray.hpp"
 #include "output/screen.hpp"
 
 #include <cmath>
@@ -20,8 +19,7 @@ public:
 
   AnimationEngine(Screen &, AnimFunc, AnimFunc, float = 60.0F);
   void drawLine(V3F, V3F, float = 3, char = '#');
-  void drawGraph(GV3F, float, float, float, float = 3, char = '#');
-  void drawMesh(const Mesh &, float, float, float);
+  void drawGraph(GV3F, float = 3, char = '#');
   [[noreturn]] void run();
   [[nodiscard]] float frameRate() const;
   [[nodiscard]] float frameTime() const;

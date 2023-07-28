@@ -1,7 +1,6 @@
 #include "animation/animation_engine.hpp"
 
-#include "graphics/ray.hpp"
-
+#include <cmath>
 #include <limits>
 
 AnimationEngine::AnimationEngine(Screen &screen, AnimFunc setup, AnimFunc loop,
@@ -28,47 +27,54 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
       p.x = float(j) - centerX;
       ap = p - a;
       proj = (ap.dot(abn)) * abn;
-      t = ((a + proj).x - a.x) / ab.x;
-      if ((ap - proj).length() < thickness && 0.0F <= t && t <= 1.0F)
+      // vertical lines were not drawn before, so I asked ChatGPT why and it
+      // gave me this solution. I'm too lazy to check the underlying reason, but
+      // it sure does work now. previously instead of the ternary op it was just
+      // t = ((a + proj).x - a.x) / ab.x;
+      t = std::abs(ab.x) < std::numeric_limits<float>::epsilon() * 10
+              ? ap.y / ab.y
+              : ((a + proj).x - a.x) / ab.x;
+      if ((ap - proj).length() < thickness && 0.0F < t && t < 1.0F)
         screen_.set(i, j, fill);
     }
   }
 }
 
-void AnimationEngine::drawGraph(GV3F g, float tx, float ty, float tz,
-                                float thickness, char fill) {
-  V3F center{};
+void AnimationEngine::drawGraph(GV3F g, float thickness, char fill) {
   for (auto &vertex : g.vertices())
-    center = center + vertex;
-  center = center / static_cast<float>(g.order());
+    vertex.transformAsPoint(g.transform());
 
-  for (auto &vertex : g.vertices())
-    vertex = vertex - center;
+  // TODO: eventually create a Camera class that has all these
+  static constexpr auto fov{3.0f},
+      fovRad{fov * (std::numbers::pi_v<float> / 180.0f)};
+  static constexpr auto nearZ{0.0f},
+      farZ{std::numeric_limits<float>::infinity()};
+  const auto xFactor{1.0f / std::tan(fovRad / 2.0f)},
+      yFactor{1.0f / std::tan(fovRad / 2.0f)};
 
-  // rotation around x-axis
-  float tmp;
+  // TODO: tidy this up a bit
   for (auto &vertex : g.vertices()) {
-    tmp = vertex.y;
-    vertex.y = vertex.y * std::cos(tx) - vertex.z * std::sin(tx);
-    vertex.z = tmp * std::sin(tx) + vertex.z * std::cos(tx);
-  }
 
-  // rotation around y-axis
-  for (auto &vertex : g.vertices()) {
-    tmp = vertex.x;
-    vertex.x = vertex.x * std::cos(ty) + vertex.z * std::sin(ty);
-    vertex.z = vertex.z * std::cos(ty) - tmp * std::sin(ty);
+    // perspective projection matrix stolen and adapted from
+    // https://ogldev.org/www/tutorial12/tutorial12.html
+    M4F perspectiveMatrix{xFactor,
+                          0,
+                          0,
+                          0,
+                          0,
+                          yFactor,
+                          0,
+                          0,
+                          0,
+                          0,
+                          (-nearZ - farZ) / (nearZ - farZ),
+                          (2 * farZ * nearZ) / (nearZ - farZ),
+                          0,
+                          0,
+                          -1,
+                          1};
+    vertex.transformAsPoint(perspectiveMatrix);
   }
-
-  // rotation around z-axis
-  for (auto &vertex : g.vertices()) {
-    tmp = vertex.x;
-    vertex.x = vertex.x * std::cos(tz) - vertex.y * std::sin(tz);
-    vertex.y = tmp * std::sin(tz) + vertex.y * std::cos(tz);
-  }
-
-  for (auto &vertex : g.vertices())
-    vertex = vertex + center;
 
   for (size_t i{}; i < g.order(); ++i)
     for (auto elem : g.edges(i))
@@ -96,39 +102,3 @@ void AnimationEngine::drawGraph(GV3F g, float tx, float ty, float tz,
 Screen &AnimationEngine::screen() { return screen_; }
 
 void AnimationEngine::delay(DWORD milliseconds) { Sleep(milliseconds); }
-
-static constexpr char brightnessChars[]{
-    '`', '.', '-', '\'', ':', '_', ',', '^', '=', ';', '>', '<', '+',
-    '!', 'r', 'c', '*',  '/', 'z', '?', 's', 'L', 'T', 'v', ')', 'J',
-    '7', '(', '|', 'F',  'i', '{', 'C', '}', 'f', 'I', '3', '1', 't',
-    'l', 'u', '[', 'n',  'e', 'o', 'Z', '5', 'Y', 'x', 'j', 'y', 'a',
-    ']', '2', 'E', 'S',  'w', 'q', 'k', 'P', '6', 'h', '9', 'd', '4',
-    'V', 'p', 'O', 'G',  'b', 'U', 'A', 'K', 'X', 'H', 'm', '8', 'R',
-    'D', '#', '$', 'B',  'g', '0', 'M', 'N', 'W', 'Q', '%', '&', '@'};
-
-void AnimationEngine::drawMesh(const Mesh &mesh, float tx, float ty, float tz) {
-  for (size_t i{}; i < screen_.height(); ++i) {
-    for (size_t j{}; j < screen_.width(); ++j) {
-      V3F p{float(j) - float(screen_.width()) / 2.0F,
-            float(i) - float(screen_.height()) / 2.0F, 0.0F};
-      R3F ray{p, {0, 0, -1}};
-      auto [hit, point, normal]{ray.intersection(mesh)};
-      if (!hit)
-        continue;
-      auto ia{0.0F}, oa{0.01F}, od{0.5F}, os{0.5F};
-      // only one light for testing purposes here. TODO: generalize
-      V3F lightPos{0, 10, 0};
-      auto lightColor{0.01F};
-      auto ll{point - lightPos}, rl{ll - 2 * normal.dot(ll) * normal};
-      float diffuseSum{-od * lightColor * normal.dot(ll)},
-          specularSum{
-              -os * lightColor *
-              std::pow(rl.dot(point), 2.0F)}; // FIXME: maybe the specular sum
-                                              // isnt negative idk anymore
-      auto color{std::min(ia * oa + diffuseSum + specularSum, 1.0F)};
-      auto c{brightnessChars[size_t(color * 90.0F)]};
-      screen_.set(i, j, c);
-      // FIXME: this whole thing is a mess, dude
-    }
-  }
-}

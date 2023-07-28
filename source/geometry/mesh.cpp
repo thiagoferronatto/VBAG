@@ -1,13 +1,5 @@
 #include "geometry/mesh.hpp"
 
-void Mesh::addVertex(const V3F &v) { vertices_.push_back(v); }
-
-void Mesh::addNormal(const V3F &v) { normals_.push_back(v.versor()); }
-
-void Mesh::addTriangle(const Triplet<size_t> &t) {
-  triangles_.push_back({this, t});
-}
-
 [[nodiscard]] const std::vector<V3F> &Mesh::vertices() const {
   return vertices_;
 }

@@ -9,9 +9,6 @@ class Mesh {
 public:
   class Triangle;
 
-  void addVertex(const V3F &);
-  void addNormal(const V3F &);
-  void addTriangle(const Triplet<size_t> &);
   [[nodiscard]] const std::vector<V3F> &vertices() const;
   [[nodiscard]] const std::vector<V3F> &normals() const;
   [[nodiscard]] const std::vector<Triangle> &triangles() const;
