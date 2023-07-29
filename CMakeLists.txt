@@ -6,6 +6,8 @@ project(very_basic_ascii_graphics_api
 
 set(CMAKE_CXX_STANDARD 20)
 
+add_compile_options(-fPIC -static -static-libgcc -static-libstdc++)
+
 include_directories(include)
 
 add_executable(VBAG

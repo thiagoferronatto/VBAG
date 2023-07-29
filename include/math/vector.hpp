@@ -43,7 +43,8 @@ template <> struct Vector<float, 3> {
     *this = transformedAsPoint(matrix);
   }
 
-  [[maybe_unused]] [[nodiscard]] auto transformedAsVector(const M4F &matrix) const {
+  [[maybe_unused]] [[nodiscard]] auto
+  transformedAsVector(const M4F &matrix) const {
     Matrix<float, 4, 1> extended{x, y, z, 0};
     auto result{matrix * extended};
     return Vector{result.data[0], result.data[1], result.data[2]};
@@ -78,16 +79,21 @@ template <> struct Vector<float, 3> {
 
   [[nodiscard]] auto length() const { return std::sqrt(dot(*this)); }
 
-  [[nodiscard]] auto versor() const { return operator/(length()); }
+  [[nodiscard]] auto versor() const {
+    if (isZero())
+      return Vector{};
+    return operator/(length());
+  }
 
-  void normalize() { *this = versor(); }
+  void normalize() {
+    if (isZero())
+      return;
+    *this = versor();
+  }
 
-  [[nodiscard]] auto isZero() const {
-    constexpr auto eps{std::numeric_limits<float>::epsilon()};
-    const auto xEps{eps * x}, yEps{eps * y}, zEps{eps * z};
-    return std::abs(x) < std::abs(xEps) && //
-           std::abs(y) < std::abs(yEps) && //
-           std::abs(z) < std::abs(zEps);
+  [[nodiscard]] bool isZero() const {
+    constexpr auto eps{1e-5f};
+    return std::abs(x) < eps && std::abs(y) < eps && std::abs(z) < eps;
   }
 
   float x, y, z;

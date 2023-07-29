@@ -8,7 +8,7 @@ class Object {
 public:
   void scale(V3F scales) {
     // TODO: try scaling to see if it works
-    //M4F scalingMatrix{
+    // M4F scalingMatrix{
     //    scales.x, 0,        0,        0, //
     //    0,        scales.y, 0,        0, //
     //    0,        0,        scales.z, 0, //
@@ -62,6 +62,23 @@ public:
   void translate(float x, float y, float z) { translate({x, y, z}); }
 
   const M4F &transform() { return transform_; }
+
+  [[nodiscard]] V3F forward() const {
+    V3F col3{transform_(0, 2), transform_(1, 2), transform_(2, 2)};
+    auto sz{col3.length()};
+    col3 /= sz;
+    return col3;
+  }
+
+  [[nodiscard]] V3F right() const {
+    const V3F col1{transform_(0, 0), transform_(1, 0), transform_(2, 0)};
+    return col1.versor();
+  }
+
+  [[nodiscard]] V3F up() const {
+    V3F col2{transform_(0, 1), transform_(1, 1), transform_(2, 1)};
+    return col2.versor();
+  }
 
 protected:
   M4F transform_{

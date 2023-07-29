@@ -1,19 +1,25 @@
 #include "tests/animation_test.hpp"
 
 // WINDOWS ONLY
+#undef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
+#ifdef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
 #include <conio.h>
+#else
+#include <windows.h>
+#endif
 
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
 #include "output/screen.hpp"
 
 void testAnimations() {
-  // current angular velocities
-  float txv{}, tyv{}, tzv{};
-  // current angles of rotation
-  float tx{std::numbers::pi_v<float> / 2.0F}, ty{}, tz{};
-  // max angular velocity and acceleration (otherwise pc go boom)
-  constexpr float maxVel{.075F} /*, maxAcc{.001F}*/;
+  puts("WASD movem o cubo (sim, eh um cubo so q alongado)\nQ e E "
+       "rotacionam.\nEspaco faz ele pular.\nEsc fecha o game.\nPressione enter "
+       "pra comecar.\n");
+  (void)getc(stdin);
+
+  V3F velocity{};
+
   // a graph that will hold our shape
   GV3F g;
 
@@ -22,15 +28,14 @@ void testAnimations() {
     constexpr size_t a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g_ = 6, h = 7;
 
     // a cube
-    constexpr auto scale{10.0f};
-    g.addVertex(V3F{-1, 1, 1} * scale);
-    g.addVertex(V3F{-1, -1, 1} * scale);
-    g.addVertex(V3F{1, -1, 1} * scale);
-    g.addVertex(V3F{1, 1, 1} * scale);
-    g.addVertex(V3F{1, 1, -1} * scale);
-    g.addVertex(V3F{-1, 1, -1} * scale);
-    g.addVertex(V3F{-1, -1, -1} * scale);
-    g.addVertex(V3F{1, -1, -1} * scale);
+    g.addVertex({-1, 1, 1});
+    g.addVertex({-1, -1, 1});
+    g.addVertex({1, -1, 1});
+    g.addVertex({1, 1, 1});
+    g.addVertex({1, 1, -1});
+    g.addVertex({-1, 1, -1});
+    g.addVertex({-1, -1, -1});
+    g.addVertex({1, -1, -1});
 
     g.addEdge(a, b);
     g.addEdge(a, d);
@@ -47,53 +52,87 @@ void testAnimations() {
   };
 
   // moving it away from the camera a lil bit
-  g.translate(0, 0, -30);
+  g.translate(0, 0, -5);
 
   auto loopFunc = [&](AnimationEngine *engine) {
-    // current angular accelerations
-    float txa{}, tya{}, tza{};
+    // current accelerations
+    V3F acceleration{};
+    V3F rotation{};
 
-    static constexpr float accelerationFactorPerFrame{0.1f};
+    static constexpr auto accelerationFactorPerFrame{0.05f};
+    static constexpr V3F gravity{0, 0.1f, 0};
 
     // getting some keyboard input (WINDOWS ONLY)
+#ifdef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
     if (_kbhit()) {
       auto key{_getch()};
       switch (key) {
       case 'w':
-        tza = -accelerationFactorPerFrame;
+        acceleration -= g.forward() * accelerationFactorPerFrame;
         break;
       case 'a':
-        txa = -accelerationFactorPerFrame;
+        acceleration -= g.right() * accelerationFactorPerFrame;
         break;
       case 's':
-        tza = accelerationFactorPerFrame;
+        acceleration += g.forward() * accelerationFactorPerFrame;
         break;
       case 'd':
-        txa = accelerationFactorPerFrame;
+        acceleration += g.right() * accelerationFactorPerFrame;
         break;
       case 'q':
-        tya = -accelerationFactorPerFrame;
+        rotation += V3F{0, accelerationFactorPerFrame, 0};
         break;
       case 'e':
-        tya = accelerationFactorPerFrame;
+        rotation -= V3F{0, accelerationFactorPerFrame, 0};
         break;
       default:
         break;
       }
     }
+#else  // the much prettier alternative
+    if (GetAsyncKeyState('W') & 0x8000)
+      acceleration -= g.forward();
 
-    // incrementing the velocity by the angular acceleration
-    txv += txa;
-    tyv += tya;
-    tzv += tza;
+    if (GetAsyncKeyState('A') & 0x8000)
+      acceleration -= g.right();
 
-    // moving the cube by its current velocity
-    g.translate(txv, tyv, tzv);
+    if (GetAsyncKeyState('S') & 0x8000)
+      acceleration += g.forward();
+
+    if (GetAsyncKeyState('D') & 0x8000)
+      acceleration += g.right();
+
+    if (GetAsyncKeyState('Q') & 0x8000)
+      rotation += V3F{0, 1, 0};
+
+    if (GetAsyncKeyState('E') & 0x8000)
+      rotation -= V3F{0, 1, 0};
+
+    acceleration = acceleration.versor() * accelerationFactorPerFrame;
+    rotation *= accelerationFactorPerFrame;
+
+    if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform()(1, 3) <= 0)
+      acceleration += {0, 1, 0};
+
+    if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+      exit(0);
+#endif // USE_CONIO_H_INSTEAD_OF_WINDOWS_H
+
+    // incrementing the velocity by the acceleration
+    velocity += acceleration;
+
+    // applying movement and rotation
+    g.translate(velocity);
+    g.rotateInPlace(rotation);
 
     // simulating deceleration by drag
-    txv *= 0.95f;
-    tyv *= 0.95f;
-    tzv *= 0.95f;
+    velocity *= 0.9f;
+
+    // applying gravity and detecting collision with the ground plane y = 0
+    if (g.transform()(1, 3) < 0)
+      g.translate(0, -g.transform()(1, 3), 0);
+    else
+      velocity -= gravity;
 
     // clearing the previous frame
     engine->screen().fill(' ');
@@ -106,6 +145,6 @@ void testAnimations() {
   };
 
   Screen screen{180, 40};
-  AnimationEngine engine{screen, setupFunc, loopFunc, 75};
+  AnimationEngine engine{screen, setupFunc, loopFunc, 60};
   engine.run();
 }

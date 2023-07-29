@@ -4,6 +4,7 @@
 #include "geometry/object.hpp"
 
 #include <cassert>
+#include <cstdio>
 #include <list>
 #include <vector>
 
@@ -24,15 +25,18 @@ public:
     adjacencyLists_[vertex2].push_back(vertex1);
   }
 
-  [[maybe_unused]] const auto &vertices() const { return vertices_; }
+  [[maybe_unused]] [[nodiscard]] const auto &vertices() const {
+    return vertices_;
+  }
+
   auto &vertices() { return vertices_; }
 
-  [[maybe_unused]] const auto &edges(size_t vertex) const {
+  [[maybe_unused]] [[nodiscard]] const auto &edges(size_t vertex) const {
     return adjacencyLists_[vertex];
   }
   auto &edges(size_t vertex) { return adjacencyLists_[vertex]; }
 
-  auto order() const { return vertices_.size(); }
+  [[nodiscard]] auto order() const { return vertices_.size(); }
 
   void rotateInPlace(V3F eulerAngles) override {
     V3F center{};
@@ -47,6 +51,30 @@ public:
 
   void rotateInPlace(float x, float y, float z) override {
     rotateInPlace({x, y, z});
+  }
+
+  static Graph<V3F> fromWavefrontObj(const char *objFileName) { // FIXME
+    std::FILE *handle;
+    fopen_s(&handle, objFileName, "r");
+    if (!handle)
+      return {};
+    Graph<V3F> graph;
+    {
+      float x, y, z;
+      while (fscanf_s(handle, "v %f %f %f", &x, &y, &z))
+        graph.addVertex({x, y, z});
+    }
+    {
+      size_t a, b, c, d;
+      while (fscanf_s(handle, "f %zu %zu %zu %zu", &a, &b, &c, &d)) {
+        graph.addEdge(a, b);
+        graph.addEdge(b, c);
+        graph.addEdge(c, d);
+        graph.addEdge(d, a);
+      }
+    }
+    fclose(handle);
+    return graph;
   }
 
 private:
