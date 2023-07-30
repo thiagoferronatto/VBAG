@@ -38,6 +38,11 @@ public:
   inline auto width() const { return width_ - 1U; }
   inline auto height() const { return height_; }
 
+  // this is supposed to account for the fact that characters are way closer
+  // horizontally than vertically in most console windows; this is not a one
+  // size fits all solution, but no one else is gonna try this anyways
+  static constexpr auto stretchFactor{0.55f};
+
 private:
   T *const buffer_;
   size_t width_, height_;

@@ -38,45 +38,6 @@ public:
 
   [[nodiscard]] auto order() const { return vertices_.size(); }
 
-  void rotateInPlace(V3F eulerAngles) override {
-    V3F center{};
-    for (const auto &vertex : vertices_)
-      center += vertex;
-    center /= order();
-    center.transformAsPoint(transform_);
-    translate(-center);
-    rotate(eulerAngles);
-    translate(center);
-  }
-
-  void rotateInPlace(float x, float y, float z) override {
-    rotateInPlace({x, y, z});
-  }
-
-  static Graph<V3F> fromWavefrontObj(const char *objFileName) { // FIXME
-    std::FILE *handle;
-    fopen_s(&handle, objFileName, "r");
-    if (!handle)
-      return {};
-    Graph<V3F> graph;
-    {
-      float x, y, z;
-      while (fscanf_s(handle, "v %f %f %f", &x, &y, &z))
-        graph.addVertex({x, y, z});
-    }
-    {
-      size_t a, b, c, d;
-      while (fscanf_s(handle, "f %zu %zu %zu %zu", &a, &b, &c, &d)) {
-        graph.addEdge(a, b);
-        graph.addEdge(b, c);
-        graph.addEdge(c, d);
-        graph.addEdge(d, a);
-      }
-    }
-    fclose(handle);
-    return graph;
-  }
-
 private:
   std::vector<T> vertices_;
   std::vector<std::list<size_t>> adjacencyLists_;

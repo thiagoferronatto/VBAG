@@ -15,7 +15,6 @@ include_directories(include)
 
 add_executable(VBAG
         include/animation/animation_engine.hpp
-        include/data/triplet.hpp
         include/geometry/graph.hpp
         include/math/vector.hpp
         include/output/screen.hpp
@@ -24,4 +23,4 @@ add_executable(VBAG
         source/tests/animation_test.cpp
         source/main.cpp include/util/floating_point_comparison.hpp
         include/math/matrix.hpp
-        include/geometry/object.hpp)
+        include/geometry/object.hpp source/graphics/camera.cpp include/graphics/camera.hpp source/geometry/transform.cpp include/geometry/transform.hpp)

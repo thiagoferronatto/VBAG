@@ -10,8 +10,15 @@
 // ideally this should be employed for 3x3 or 4x4 matrices
 template <typename T, size_t h, size_t w> class Matrix {
 public:
-  T operator()(size_t row, size_t col) const { return data[row * w + col]; }
+  [[nodiscard]] T operator()(size_t row, size_t col) const {
+    return data[row * w + col];
+  }
+
   T &operator()(size_t row, size_t col) { return data[row * w + col]; }
+
+  [[nodiscard]] T operator[](size_t index) const { return data[index]; }
+
+  T &operator[](size_t index) { return data[index]; }
 
   Matrix operator-() const {
     return unaryOperationResult(*this, std::negate{});
@@ -42,6 +49,7 @@ public:
   Matrix operator/(T scalar) const { return operator*(T{1} / scalar); }
 
   [[nodiscard]] size_t height() const { return h; }
+
   [[nodiscard]] size_t width() const { return w; }
 
   T data[h * w];

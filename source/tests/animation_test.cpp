@@ -1,21 +1,20 @@
 #include "tests/animation_test.hpp"
 
-// WINDOWS ONLY
-#undef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
-#ifdef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
-#include <conio.h>
-#else
 #include <windows.h>
-#endif
 
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
 #include "output/screen.hpp"
 
 void testAnimations() {
-  fputs("WASD movem o cubo (sim, eh um cubo so q alongado)\nQ e E "
-       "rotacionam.\nEspaco faz ele pular.\nEsc fecha o game.\nDigite uma "
-       "resolucao pra iniciar (ex.: 100x25): ", stdout);
+  fputs("WASD movem o cubo\n"
+        "Q e E rotacionam o cubo.\n"
+        "Espaco faz o cubo pular.\n"
+        "IJKL movimentam a camera.\n"
+        "U e O rotacionam a camera.\n"
+        "Esc fecha o game.\n"
+        "Digite uma resolucao pra iniciar (ex.: 100x25): ",
+        stdout);
   size_t width, height;
   scanf_s("%zux%zu", &width, &height);
 
@@ -52,7 +51,11 @@ void testAnimations() {
     g.addEdge(g_, h);
 
     // moving it away from the camera a lil bit
-    g.translate(0, 0, -5);
+    g.transform().translate(0, 0, -5);
+
+    // this should visually compensate for the axis-aligned spacing of the
+    // grid of characters in the console
+    // g.transform().scale(1, .5, 1);
   };
 
   auto loopFunc = [&](AnimationEngine *engine) {
@@ -64,74 +67,67 @@ void testAnimations() {
     static constexpr V3F gravity{0, 0.1f, 0};
 
     // getting some keyboard input (WINDOWS ONLY)
-#ifdef USE_CONIO_H_INSTEAD_OF_WINDOWS_H
-    if (_kbhit()) {
-      auto key{_getch()};
-      switch (key) {
-      case 'w':
-        acceleration -= g.forward() * accelerationFactorPerFrame;
-        break;
-      case 'a':
-        acceleration -= g.right() * accelerationFactorPerFrame;
-        break;
-      case 's':
-        acceleration += g.forward() * accelerationFactorPerFrame;
-        break;
-      case 'd':
-        acceleration += g.right() * accelerationFactorPerFrame;
-        break;
-      case 'q':
-        rotation += V3F{0, accelerationFactorPerFrame, 0};
-        break;
-      case 'e':
-        rotation -= V3F{0, accelerationFactorPerFrame, 0};
-        break;
-      default:
-        break;
-      }
-    }
-#else  // the much prettier alternative
     if (GetAsyncKeyState('W') & 0x8000)
-      acceleration -= g.forward();
+      acceleration -= g.transform().forward();
 
     if (GetAsyncKeyState('A') & 0x8000)
-      acceleration -= g.right();
+      acceleration -= g.transform().right();
 
     if (GetAsyncKeyState('S') & 0x8000)
-      acceleration += g.forward();
+      acceleration += g.transform().forward();
 
     if (GetAsyncKeyState('D') & 0x8000)
-      acceleration += g.right();
+      acceleration += g.transform().right();
 
     if (GetAsyncKeyState('Q') & 0x8000)
-      rotation += V3F{0, 1, 0};
+      rotation += V3F::up();
 
     if (GetAsyncKeyState('E') & 0x8000)
-      rotation -= V3F{0, 1, 0};
+      rotation -= V3F::up();
+
+    if (GetAsyncKeyState('I') & 0x8000)
+      engine->camera().transform().translate(V3F::up() *
+                                             accelerationFactorPerFrame);
+    if (GetAsyncKeyState('J') & 0x8000)
+      engine->camera().transform().translate(-V3F::right() *
+                                             accelerationFactorPerFrame);
+    if (GetAsyncKeyState('K') & 0x8000)
+      engine->camera().transform().translate(-V3F::up() *
+                                             accelerationFactorPerFrame);
+    if (GetAsyncKeyState('L') & 0x8000)
+      engine->camera().transform().translate(V3F::right() *
+                                             accelerationFactorPerFrame);
+
+    if (GetAsyncKeyState('U') & 0x8000)
+      engine->camera().transform().rotateInPlace(V3F::up() *
+                                                 accelerationFactorPerFrame);
+
+    if (GetAsyncKeyState('O') & 0x8000)
+      engine->camera().transform().rotateInPlace(-V3F::up() *
+                                                 accelerationFactorPerFrame);
 
     acceleration = acceleration.versor() * accelerationFactorPerFrame;
     rotation *= accelerationFactorPerFrame;
 
-    if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform()(1, 3) <= 0)
-      acceleration += {0, 1, 0};
+    if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform().y <= 0)
+      acceleration += V3F::up();
 
     if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
       exit(0);
-#endif // USE_CONIO_H_INSTEAD_OF_WINDOWS_H
 
     // incrementing the velocity by the acceleration
     velocity += acceleration;
 
     // applying movement and rotation
-    g.translate(velocity);
-    g.rotateInPlace(rotation);
+    g.transform().translate(velocity);
+    g.transform().rotateInPlace(rotation);
 
     // simulating deceleration by drag
     velocity *= 0.9f;
 
     // applying gravity and detecting collision with the ground plane y = 0
-    if (g.transform()(1, 3) < 0)
-      g.translate(0, -g.transform()(1, 3), 0);
+    if (g.transform().y < 0)
+      g.transform().translate(0, -g.transform().y, 0);
     else
       velocity -= gravity;
 

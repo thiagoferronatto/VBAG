@@ -2,6 +2,7 @@
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_VECTOR_HPP
 
 #include "math/matrix.hpp"
+#include "util/floating_point_comparison.hpp"
 #include <cmath>
 #include <cstdint>
 
@@ -29,33 +30,6 @@ template <> struct Vector<float, 3> {
 
   [[nodiscard]] auto operator*(float scalar) const {
     return Vector{scalar * x, scalar * y, scalar * z};
-  }
-
-  [[nodiscard]] auto transformedAsPoint(const M4F &matrix) const {
-    Matrix<float, 4, 1> extended{x, y, z, 1};
-    auto result{matrix * extended};
-    auto den{result.data[3]};
-    return Vector{result.data[0] / den, result.data[1] / den,
-                  result.data[2] / den};
-  }
-
-  auto transformAsPoint(const M4F &matrix) {
-    *this = transformedAsPoint(matrix);
-  }
-
-  [[maybe_unused]] [[nodiscard]] auto
-  transformedAsVector(const M4F &matrix) const {
-    Matrix<float, 4, 1> extended{x, y, z, 0};
-    auto result{matrix * extended};
-    return Vector{result.data[0], result.data[1], result.data[2]};
-  }
-
-  auto transformAsVector(const M4F &matrix) {
-    Matrix<float, 4, 1> extended{x, y, z, 0};
-    auto result{matrix * extended};
-    x = result.data[0];
-    y = result.data[1];
-    z = result.data[2];
   }
 
   [[nodiscard]] friend auto operator*(float scalar, const Vector &v) {
@@ -92,9 +66,12 @@ template <> struct Vector<float, 3> {
   }
 
   [[nodiscard]] bool isZero() const {
-    constexpr auto eps{1e-5f};
-    return std::abs(x) < eps && std::abs(y) < eps && std::abs(z) < eps;
+    return ::isZero(x) && ::isZero(y) && ::isZero(z);
   }
+
+  static constexpr auto right() { return Vector{1, 0, 0}; }
+  static constexpr auto up() { return Vector{0, 1, 0}; }
+  static constexpr auto forward() { return Vector{0, 0, -1}; }
 
   float x, y, z;
 };
