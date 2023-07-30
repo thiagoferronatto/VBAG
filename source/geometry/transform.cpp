@@ -6,13 +6,7 @@ float Transform::operator[](size_t index) const {
   return transform_.data[index];
 }
 
-float &Transform::operator[](size_t index) { return transform_.data[index]; }
-
 float Transform::operator()(size_t row, size_t col) const {
-  return transform_(row, col);
-}
-
-float &Transform::operator()(size_t row, size_t col) {
   return transform_(row, col);
 }
 
@@ -95,7 +89,7 @@ void Transform::translate(float xt, float yt, float zt) {
   translate({xt, yt, zt});
 }
 
-V3F Transform::translation() const { return {x, y, z}; }
+V3F Transform::translation() const { return {x(), y(), z()}; }
 
 M4F Transform::operator*(const Transform &other) const {
   return transform_ * other.transform_;

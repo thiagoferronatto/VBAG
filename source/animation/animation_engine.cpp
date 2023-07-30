@@ -55,10 +55,11 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
 void AnimationEngine::drawGraph(const GV3F &g, float thickness, char fill) {
   const auto mvp{camera_.perspective() * camera_.worldToCamera() *
                  g.transform()};
+  V3F a, b;
   for (size_t i{}; i < g.order(); ++i) {
-    auto a{mvp * g.vertices()[i]};
+    a = mvp * g.vertices()[i];
     for (auto elem : g.edges(i)) {
-      auto b{mvp * g.vertices()[elem]};
+      b = mvp * g.vertices()[elem];
       drawLine(a, b, thickness, fill);
     }
   }

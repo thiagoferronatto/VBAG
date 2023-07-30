@@ -109,7 +109,7 @@ void testAnimations() {
     acceleration = acceleration.versor() * accelerationFactorPerFrame;
     rotation *= accelerationFactorPerFrame;
 
-    if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform().y <= 0)
+    if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform().y() <= 0)
       acceleration += V3F::up();
 
     if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
@@ -126,8 +126,8 @@ void testAnimations() {
     velocity *= 0.9f;
 
     // applying gravity and detecting collision with the ground plane y = 0
-    if (g.transform().y < 0)
-      g.transform().translate(0, -g.transform().y, 0);
+    if (g.transform().y() < 0)
+      g.transform().translate(0, -g.transform().y(), 0);
     else
       velocity -= gravity;
 
