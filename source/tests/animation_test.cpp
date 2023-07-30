@@ -24,38 +24,10 @@ void testAnimations() {
   GV3F g;
 
   auto setupFunc = [&](AnimationEngine *engine) {
-    // these are really not necessary, they just let me know what I'm doing l8tr
-    constexpr size_t a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g_ = 6, h = 7;
-
-    // a cube
-    g.addVertex({-1, 1, 1});
-    g.addVertex({-1, -1, 1});
-    g.addVertex({1, -1, 1});
-    g.addVertex({1, 1, 1});
-    g.addVertex({1, 1, -1});
-    g.addVertex({-1, 1, -1});
-    g.addVertex({-1, -1, -1});
-    g.addVertex({1, -1, -1});
-
-    g.addEdge(a, b);
-    g.addEdge(a, d);
-    g.addEdge(a, f);
-    g.addEdge(b, c);
-    g.addEdge(b, g_);
-    g.addEdge(c, d);
-    g.addEdge(c, h);
-    g.addEdge(d, e);
-    g.addEdge(e, f);
-    g.addEdge(e, h);
-    g.addEdge(f, g_);
-    g.addEdge(g_, h);
+    g = GV3F::cube();
 
     // moving it away from the camera a lil bit
     g.transform().translate(0, 0, -5);
-
-    // this should visually compensate for the axis-aligned spacing of the
-    // grid of characters in the console
-    // g.transform().scale(1, .5, 1);
   };
 
   auto loopFunc = [&](AnimationEngine *engine) {
