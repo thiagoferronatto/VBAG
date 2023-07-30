@@ -13,10 +13,11 @@
 #include "output/screen.hpp"
 
 void testAnimations() {
-  puts("WASD movem o cubo (sim, eh um cubo so q alongado)\nQ e E "
-       "rotacionam.\nEspaco faz ele pular.\nEsc fecha o game.\nPressione enter "
-       "pra comecar.\n");
-  (void)getc(stdin);
+  fputs("WASD movem o cubo (sim, eh um cubo so q alongado)\nQ e E "
+       "rotacionam.\nEspaco faz ele pular.\nEsc fecha o game.\nDigite uma "
+       "resolucao pra iniciar (ex.: 100x25): ", stdout);
+  size_t width, height;
+  scanf_s("%zux%zu", &width, &height);
 
   V3F velocity{};
 
@@ -49,10 +50,10 @@ void testAnimations() {
     g.addEdge(e, h);
     g.addEdge(f, g_);
     g.addEdge(g_, h);
-  };
 
-  // moving it away from the camera a lil bit
-  g.translate(0, 0, -5);
+    // moving it away from the camera a lil bit
+    g.translate(0, 0, -5);
+  };
 
   auto loopFunc = [&](AnimationEngine *engine) {
     // current accelerations
@@ -144,7 +145,7 @@ void testAnimations() {
     AnimationEngine::delay(static_cast<DWORD>(engine->frameTime()));
   };
 
-  Screen screen{180, 40};
+  Screen screen{width, height};
   AnimationEngine engine{screen, setupFunc, loopFunc, 60};
   engine.run();
 }
