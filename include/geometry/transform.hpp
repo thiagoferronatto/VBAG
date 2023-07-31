@@ -5,10 +5,12 @@
 #include "math/vector.hpp"
 #include "util/floating_point_comparison.hpp"
 
+class Object;
+
 class Transform {
 public:
-  Transform() = default;
-  Transform(const M4F &);
+  Transform(Object *object) : object_{object} {}
+  Transform(const M4F &, Object &);
   [[nodiscard]] float operator[](size_t) const;
   [[nodiscard]] float operator()(size_t, size_t) const;
   [[nodiscard]] V3F operator*(const V3F &) const;
@@ -40,6 +42,7 @@ private:
                  0, 1, 0, 0, //
                  0, 0, 1, 0, //
                  0, 0, 0, 1};
+  Object *object_;
 };
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_TRANSFORM_HPP

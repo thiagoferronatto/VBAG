@@ -53,7 +53,7 @@ template <> struct Vector<float, 3> {
 
   [[nodiscard]] auto length() const { return std::sqrt(dot(*this)); }
 
-  [[nodiscard]] auto versor() const {
+  [[nodiscard]] auto normalized() const {
     if (isZero())
       return Vector{};
     return operator/(length());
@@ -62,7 +62,7 @@ template <> struct Vector<float, 3> {
   void normalize() {
     if (isZero())
       return;
-    *this = versor();
+    *this = normalized();
   }
 
   [[nodiscard]] bool isZero() const {

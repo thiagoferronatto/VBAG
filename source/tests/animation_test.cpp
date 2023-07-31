@@ -21,11 +21,9 @@ void testAnimations() {
   V3F velocity{};
 
   // a graph that will hold our shape
-  GV3F g;
+  GV3F g{GV3F::cube("cube")};
 
   auto setupFunc = [&](AnimationEngine *engine) {
-    g = GV3F::cube();
-
     // moving it away from the camera a lil bit
     g.transform().translate(0, 0, -5);
   };
@@ -78,7 +76,7 @@ void testAnimations() {
       engine->camera().transform().rotateInPlace(-V3F::up() *
                                                  accelerationFactorPerFrame);
 
-    acceleration = acceleration.versor() * accelerationFactorPerFrame;
+    acceleration = acceleration.normalized() * accelerationFactorPerFrame;
     rotation *= accelerationFactorPerFrame;
 
     if ((GetAsyncKeyState(VK_SPACE) & 0x8000) && g.transform().y() <= 0)

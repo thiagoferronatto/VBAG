@@ -12,7 +12,7 @@
 /// @tparam T the type that each vertex contains
 template <typename T> class Graph : public Object {
 public:
-  Graph() = default;
+  Graph(const std::string &name) : Object(name){};
 
   auto addVertex(const T &position) {
     vertices_.emplace_back(position);
@@ -43,10 +43,10 @@ public:
 
   [[nodiscard]] auto order() const { return vertices_.size(); }
 
-  static Graph<V3F> cube() {
+  static Graph<V3F> cube(const std::string &name) {
     static constexpr size_t a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6,
                             h = 7;
-    Graph<V3F> graph;
+    Graph<V3F> graph{name};
     graph.addVertex(-1, 1, 1);
     graph.addVertex(-1, -1, 1);
     graph.addVertex(1, -1, 1);

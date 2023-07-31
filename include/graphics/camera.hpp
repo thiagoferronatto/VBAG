@@ -14,8 +14,8 @@ private:
   };
 
 public:
-  Camera(float fovDeg, float aspectRatio)
-      : fovDeg_{fovDeg}, aspectRatio_{aspectRatio} {
+  Camera(const std::string& name, float fovDeg, float aspectRatio)
+      : Object(name), fovDeg_{fovDeg}, aspectRatio_{aspectRatio} {
     // this should only be a concern until we have Scenes implemented
     if (amtOfCameras_)
       throw TooManyCameras{};

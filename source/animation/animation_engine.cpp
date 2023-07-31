@@ -15,9 +15,9 @@ static auto operator*(const M4F &matrix, const V3F &vector) {
 
 AnimationEngine::AnimationEngine(Screen &screen, AnimFunc setup, AnimFunc loop,
                                  float frameRate)
-    : screen_{screen},
-      camera_{3, Screen::stretchFactor * float(screen.width()) /
-                     float(screen.height())},
+    : screen_{screen}, camera_{"main_camera", 3,
+                               Screen::stretchFactor * float(screen.width()) /
+                                   float(screen.height())},
       setup_{std::move(setup)}, loop_{std::move(loop)}, frameRate_{frameRate} {}
 
 void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
@@ -29,7 +29,7 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
 
   a.z = b.z = 0.0F;
   const auto ab = b - a;
-  const auto abn = ab.versor();
+  const auto abn = ab.normalized();
   V3F p{}, ap, proj;
   float t;
   const auto centerX{float(screen_.width()) / 2.0F};
