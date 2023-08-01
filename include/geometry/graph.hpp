@@ -8,41 +8,90 @@
 #include <list>
 #include <vector>
 
-/// @brief represents a graph through an adjacency list
-/// @tparam T the type that each vertex contains
+/// @tparam T The type contained by each vertex.
+/// @class Graph
+/// @brief A class template representing a graph data structure.
+///
+/// The Graph class represents a generic graph data structure with vertices and
+/// edges. It supports adding vertices, adding edges, and provides various
+/// utility functions for working with graphs.
 template <typename T> class Graph : public Object {
 public:
-  Graph(const std::string &name) : Object(name){};
+  /// @brief Constructs a Graph object with the given name.
+  ///
+  /// @param name The name of the graph.
+  explicit Graph(const std::string &name) : Object(name){};
 
-  auto addVertex(const T &position) {
-    vertices_.emplace_back(position);
+  /// @brief Adds a vertex to the graph.
+  ///
+  /// @param value The value of the vertex to be added.
+  auto addVertex(const T &value) {
+    vertices_.emplace_back(value);
     adjacencyLists_.emplace_back();
   }
 
+  /// @brief Adds a vertex to the graph using individual x, y, and z
+  /// coordinates.
+  ///
+  /// @param x The x-coordinate of the vertex.
+  /// @param y The y-coordinate of the vertex.
+  /// @param z The z-coordinate of the vertex.
+  ///
+  /// This overload is only available for T = V3F (3D vector).
   std::enable_if_t<std::is_same_v<T, V3F>, void> //
   addVertex(float x, float y, float z) {
     addVertex({x, y, z});
   }
 
+  /// @brief Adds an edge between two vertices in the graph.
+  ///
+  /// @param vertex1 The index of the first vertex.
+  /// @param vertex2 The index of the second vertex.
   auto addEdge(size_t vertex1, size_t vertex2) {
     assert(vertex1 < vertices_.size() && vertex2 < vertices_.size());
     adjacencyLists_[vertex1].push_back(vertex2);
     adjacencyLists_[vertex2].push_back(vertex1);
   }
 
+  /// @brief Returns a constant reference to the vertices of the graph.
+  ///
+  /// @return A constant reference to the vector of vertices.
   [[maybe_unused]] [[nodiscard]] const auto &vertices() const {
     return vertices_;
   }
 
+  /// @brief Returns a reference to the vertices of the graph.
+  ///
+  /// @return A reference to the vector of vertices.
   auto &vertices() { return vertices_; }
 
+  /// @brief Returns a constant reference to the edges of a specific vertex in
+  /// the graph.
+  ///
+  /// @param vertex The index of the vertex to get the edges for.
+  /// @return A constant reference to the list of edges for the specified
+  /// vertex.
   [[maybe_unused]] [[nodiscard]] const auto &edges(size_t vertex) const {
     return adjacencyLists_[vertex];
   }
+
+  /// @brief Returns a reference to the edges of a specific vertex in the graph.
+  ///
+  /// @param vertex The index of the vertex to get the edges for.
+  /// @return A reference to the list of edges for the specified vertex.
   auto &edges(size_t vertex) { return adjacencyLists_[vertex]; }
 
+  /// @brief Returns the order of the graph (the number of vertices).
+  ///
+  /// @return The number of vertices in the graph.
   [[nodiscard]] auto order() const { return vertices_.size(); }
 
+  /// @brief Creates and returns a graph representing a cube.
+  ///
+  /// The cube graph is a special case and is provided as a static function.
+  ///
+  /// @param name The name of the cube graph.
+  /// @return A Graph<V3F> representing a cube.
   static Graph<V3F> cube(const std::string &name) {
     static constexpr size_t a{0}, b{1}, c{2}, d{3}, e{4}, f{5}, g{6}, h{7};
     Graph<V3F> graph{name};
@@ -70,8 +119,9 @@ public:
   }
 
 private:
-  std::vector<T> vertices_;
-  std::vector<std::list<size_t>> adjacencyLists_;
+  std::vector<T> vertices_; ///< The vertices of the graph.
+  std::vector<std::list<size_t>>
+      adjacencyLists_; ///< The adjacency lists for each vertex.
 };
 
 using GV3F = Graph<V3F>;

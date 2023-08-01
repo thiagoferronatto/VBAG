@@ -47,7 +47,7 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
       // it sure does work now. previously instead of the ternary op it was just
       // t = ((a + proj).x - a.x) / ab.x;
       t = isZero(ab.x) ? ap.y / ab.y : ((a + proj).x - a.x) / ab.x;
-      if ((ap - proj).length() < thickness && 0.0F < t && t < 1.0F)
+      if ((ap - proj).magnitude() < thickness && 0.0F < t && t < 1.0F)
         screen_.set(i, j, fill);
     }
   }

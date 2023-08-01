@@ -3,6 +3,8 @@
 #include "geometry/object.hpp"
 #include "graphics/camera.hpp"
 
+Transform::Transform(Object *object) : object_{object} {}
+
 Transform::Transform(const M4F &matrix, Object *object)
     : transform_{matrix}, object_{object} {
   if (!object)
@@ -24,21 +26,6 @@ V3F Transform::operator*(const V3F &vector) const {
   if (isZero(den))
     den = 1.0f;
   return V3F{result[0], result[1], result[2]} / den;
-}
-
-V3F Transform::forward() const {
-  V3F col3{transform_(0, 2), transform_(1, 2), transform_(2, 2)};
-  return col3.normalized();
-}
-
-V3F Transform::right() const {
-  const V3F col1{transform_(0, 0), transform_(1, 0), transform_(2, 0)};
-  return col1.normalized();
-}
-
-V3F Transform::up() const {
-  V3F col2{transform_(0, 1), transform_(1, 1), transform_(2, 1)};
-  return col2.normalized();
 }
 
 void Transform::scale(V3F scales) {
@@ -105,6 +92,21 @@ void Transform::translate(V3F translation) {
 
 void Transform::translate(float xt, float yt, float zt) {
   translate({xt, yt, zt});
+}
+
+V3F Transform::forward() const {
+  V3F col3{transform_(0, 2), transform_(1, 2), transform_(2, 2)};
+  return col3.normalized();
+}
+
+V3F Transform::right() const {
+  const V3F col1{transform_(0, 0), transform_(1, 0), transform_(2, 0)};
+  return col1.normalized();
+}
+
+V3F Transform::up() const {
+  V3F col2{transform_(0, 1), transform_(1, 1), transform_(2, 1)};
+  return col2.normalized();
 }
 
 V3F Transform::translation() const { return {x(), y(), z()}; }
