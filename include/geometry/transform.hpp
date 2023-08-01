@@ -9,15 +9,13 @@ class Object;
 
 class Transform {
 public:
-  Transform(Object *object) : object_{object} {}
-  Transform(const M4F &, Object &);
+  explicit Transform(Object *object) : object_{object} {}
+  Transform(const M4F &, Object *);
+
   [[nodiscard]] float operator[](size_t) const;
   [[nodiscard]] float operator()(size_t, size_t) const;
   [[nodiscard]] V3F operator*(const V3F &) const;
   [[nodiscard]] M4F operator*(const Transform &) const;
-  [[nodiscard]] V3F forward() const;
-  [[nodiscard]] V3F right() const;
-  [[nodiscard]] V3F up() const;
   void scale(V3F);
   void scale(float, float, float);
   void rotate(V3F);
@@ -26,11 +24,13 @@ public:
   void rotateInPlace(float, float, float);
   void translate(V3F);
   void translate(float, float, float);
+  [[nodiscard]] V3F forward() const;
+  [[nodiscard]] V3F right() const;
+  [[nodiscard]] V3F up() const;
   [[nodiscard]] V3F translation() const;
-
-  [[nodiscard]] auto x() const { return transform_[3]; }
-  [[nodiscard]] auto y() const { return transform_[7]; }
-  [[nodiscard]] auto z() const { return transform_[11]; }
+  [[nodiscard]] float x() const { return transform_[3]; }
+  [[nodiscard]] float y() const { return transform_[7]; }
+  [[nodiscard]] float z() const { return transform_[11]; }
 
   [[nodiscard]] friend M4F operator*(const M4F &matrix,
                                      const Transform &transform) {

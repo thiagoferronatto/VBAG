@@ -21,6 +21,17 @@ add_executable(VBAG
         include/tests/animation_test.hpp
         source/animation/animation_engine.cpp
         source/tests/animation_test.cpp
-        source/main.cpp include/util/floating_point_comparison.hpp
+        source/main.cpp
+        include/util/floating_point_comparison.hpp
         include/math/matrix.hpp
-        include/geometry/object.hpp source/graphics/camera.cpp include/graphics/camera.hpp source/geometry/transform.cpp include/geometry/transform.hpp)
+        include/geometry/object.hpp
+        source/graphics/camera.cpp
+        include/graphics/camera.hpp
+        source/geometry/transform.cpp
+        include/geometry/transform.hpp
+        source/geometry/scene.cpp
+        include/geometry/scene.hpp
+        include/util/error_handling.hpp
+        source/input/input.cpp
+        include/input/input.hpp
+        source/geometry/object.cpp)

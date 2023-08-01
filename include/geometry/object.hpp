@@ -6,28 +6,22 @@
 #include <vector>
 
 #include "geometry/transform.hpp"
+#include "util/error_handling.hpp"
 
 class Object {
 public:
-  explicit Object(std::string name) : name_{std::move(name)} {}
+  explicit Object(std::string);
 
-  [[nodiscard]] const auto &transform() const { return transform_; }
-  auto &transform() { return transform_; }
+  // this is some bullshit idk why but if this aint here dynamic_casts dont work
+  virtual ~Object();
 
-  [[nodiscard]] const auto *parent() const { return parent_; }
-
-  [[nodiscard]] const auto &children() const { return children_; }
-
-  [[nodiscard]] const auto &name() const { return name_; }
-
-  void addChild(Object *child) {
-    if (child->parent_) {
-      (void)std::remove(child->parent_->children_.begin(),
-                        child->parent_->children_.end(), child);
-    }
-    child->parent_ = this;
-    children_.push_back(child);
-  }
+  [[nodiscard]] const Transform &transform() const;
+  Transform &transform();
+  [[nodiscard]] const Object *parent() const;
+  [[nodiscard]] const std::vector<Object *> &children() const;
+  [[nodiscard]] const std::string &name() const;
+  void addChild(Object *);
+  void removeChild(Object *);
 
 protected:
   Transform transform_{this};

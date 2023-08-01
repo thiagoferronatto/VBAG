@@ -1,11 +1,13 @@
 #include "geometry/transform.hpp"
 
 #include "geometry/object.hpp"
+#include "graphics/camera.hpp"
 
-#include "cstring"
-
-Transform::Transform(const M4F &matrix, Object &object)
-    : transform_{matrix}, object_{&object} {}
+Transform::Transform(const M4F &matrix, Object *object)
+    : transform_{matrix}, object_{object} {
+  if (!object)
+    throw RuntimeError<NullPointerToObject>{};
+}
 
 float Transform::operator[](size_t index) const {
   return transform_.data[index];
@@ -40,31 +42,41 @@ V3F Transform::up() const {
 }
 
 void Transform::scale(V3F scales) {
+  // cant scale a camera bucko
+  if (dynamic_cast<Camera *>(object_))
+    return;
   transform_[0] *= scales.x;
   transform_[5] *= scales.y;
   transform_[10] *= scales.z;
-  // FIXME: this is awful
-  for (auto &child : object_->children())
+  for (auto child : object_->children())
     child->transform().scale(scales);
 }
 
 void Transform::scale(float xs, float ys, float zs) { scale({xs, ys, zs}); }
 
 void Transform::rotate(V3F eulerAngles) {
+  // TODO: always rotate in place, but change axes
   using std::sin, std::cos;
   auto &a{eulerAngles.x}, b{eulerAngles.y}, c{eulerAngles.z};
-  // clang-format off
+  const float r00{cos(b) * cos(c)};
+  const float r01{sin(a) * sin(b) * cos(c) - cos(a) * sin(c)};
+  const float r02{cos(a) * sin(b) * cos(c) + sin(a) * sin(c)};
+  const float r10{cos(b) * sin(c)};
+  const float r11{sin(a) * sin(b) * sin(c) + cos(a) * cos(c)};
+  const float r12{cos(a) * sin(b) * sin(c) - sin(a) * cos(c)};
+  const float r20{-sin(b)};
+  const float r21{sin(a) * cos(b)};
+  const float r22{cos(a) * cos(b)};
   M4F rotationMatrix{
-      cos(b) * cos(c), sin(a) * sin(b) * cos(c) - cos(a) * sin(c), cos(a) * sin(b) * cos(c) + sin(a) * sin(c), 0,
-      cos(b) * sin(c), sin(a) * sin(b) * sin(c) + cos(a) * cos(c), cos(a) * sin(b) * sin(c) - sin(a) * cos(c), 0,
-      -sin(b), sin(a) * cos(b), cos(a) * cos(b), 0,
-      0, 0, 0, 1,
+      r00, r01, r02, 0, //
+      r10, r11, r12, 0, //
+      r20, r21, r22, 0, //
+      0,   0,   0,   1,
   };
-  // clang-format on
   transform_ = rotationMatrix * transform_;
-  // TODO: always rotate in place, but change axes
-  // FIXME: this is awful
-  for (auto &child : object_->children())
+  if (auto cam = dynamic_cast<Camera *>(object_))
+    cam->updateWTC_();
+  for (auto child : object_->children())
     child->transform().rotate(eulerAngles);
 }
 
@@ -85,8 +97,9 @@ void Transform::translate(V3F translation) {
   transform_[3] += translation.x;
   transform_[7] += translation.y;
   transform_[11] += translation.z;
-  // FIXME: this is awful
-  for (auto &child : object_->children())
+  if (auto cam = dynamic_cast<Camera *>(object_))
+    cam->updateWTC_();
+  for (auto child : object_->children())
     child->transform().translate(translation);
 }
 

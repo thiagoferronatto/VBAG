@@ -19,8 +19,8 @@ public:
     adjacencyLists_.emplace_back();
   }
 
-  std::enable_if_t<std::is_same_v<T, V3F>, void> addVertex(float x, float y,
-                                                           float z) {
+  std::enable_if_t<std::is_same_v<T, V3F>, void> //
+  addVertex(float x, float y, float z) {
     addVertex({x, y, z});
   }
 
@@ -44,8 +44,7 @@ public:
   [[nodiscard]] auto order() const { return vertices_.size(); }
 
   static Graph<V3F> cube(const std::string &name) {
-    static constexpr size_t a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6,
-                            h = 7;
+    static constexpr size_t a{0}, b{1}, c{2}, d{3}, e{4}, f{5}, g{6}, h{7};
     Graph<V3F> graph{name};
     graph.addVertex(-1, 1, 1);
     graph.addVertex(-1, -1, 1);

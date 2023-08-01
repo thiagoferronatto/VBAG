@@ -1,6 +1,7 @@
 #include "animation/animation_engine.hpp"
 
-#include <cmath>
+#include <chrono>
+#include <utility>
 
 #include "util/floating_point_comparison.hpp"
 
@@ -14,11 +15,9 @@ static auto operator*(const M4F &matrix, const V3F &vector) {
 }
 
 AnimationEngine::AnimationEngine(Screen &screen, AnimFunc setup, AnimFunc loop,
-                                 float frameRate)
-    : screen_{screen}, camera_{"main_camera", 3,
-                               Screen::stretchFactor * float(screen.width()) /
-                                   float(screen.height())},
-      setup_{std::move(setup)}, loop_{std::move(loop)}, frameRate_{frameRate} {}
+                                 Scene scene, float frameRate)
+    : screen_{screen}, scene_{std::move(scene)}, setup_{std::move(setup)},
+      loop_{std::move(loop)}, frameRate_{frameRate} {}
 
 void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
   // the camera does not have a near plane, which means that stuff behind it is
@@ -29,6 +28,8 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
 
   a.z = b.z = 0.0F;
   const auto ab = b - a;
+  if (ab.isZero())
+    return;
   const auto abn = ab.normalized();
   V3F p{}, ap, proj;
   float t;
@@ -52,26 +53,47 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
   }
 }
 
-void AnimationEngine::drawGraph(const GV3F &g, float thickness, char fill) {
-  const auto mvp{camera_.perspective() * camera_.worldToCamera() *
-                 g.transform()};
+void AnimationEngine::drawGraph(const GV3F *g, float thickness, char fill) {
+  auto mainCamera{scene_.mainCamera()};
+  if (!mainCamera)
+    throw RuntimeError<SceneHasNoMainCameraSelected>{};
+  const auto mvp{mainCamera->perspective() * mainCamera->worldToCamera() *
+                 g->transform()};
   V3F a, b;
-  for (size_t i{}; i < g.order(); ++i) {
-    a = mvp * g.vertices()[i];
-    for (auto elem : g.edges(i)) {
-      b = mvp * g.vertices()[elem];
+  for (size_t i{}; i < g->order(); ++i) {
+    a = mvp * g->vertices()[i];
+    for (auto elem : g->edges(i)) {
+      b = mvp * g->vertices()[elem];
       drawLine(a, b, thickness, fill);
     }
   }
 }
 
+void AnimationEngine::draw(float thickness, char fill) {
+  for (auto &[_, object] : scene_) {
+    auto cameraPointer{dynamic_cast<Camera *>(object)};
+    if (cameraPointer)
+      continue;
+    auto graphPointer{dynamic_cast<GV3F *>(object)};
+    // here's where other kinds of objects should be drawn
+    if (graphPointer)
+      drawGraph(graphPointer, thickness, fill);
+  }
+}
+
 [[noreturn]] void AnimationEngine::run() {
+  using namespace std::chrono;
   screen_.clear();
   setup_(this);
   for (;;) {
+    auto start{steady_clock::now()};
     screen_.show();
     loop_(this);
+    delay(frameTime());
     screen_.clear();
+    auto end{steady_clock::now()};
+    auto elapsedMs{duration_cast<milliseconds>(end - start)};
+    deltaTime_ = float(elapsedMs.count()) / 1e3f;
   }
 }
 
@@ -85,6 +107,8 @@ void AnimationEngine::drawGraph(const GV3F &g, float thickness, char fill) {
 
 Screen &AnimationEngine::screen() { return screen_; }
 
-Camera &AnimationEngine::camera() { return camera_; }
+Camera &AnimationEngine::camera() { return *scene_.mainCamera(); }
 
-void AnimationEngine::delay(DWORD milliseconds) { Sleep(milliseconds); }
+void AnimationEngine::delay(float milliseconds) { Sleep(DWORD(milliseconds)); }
+
+float AnimationEngine::deltaTime() const { return deltaTime_; }
