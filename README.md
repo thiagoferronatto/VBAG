@@ -111,7 +111,7 @@ auto cameraAspectRatio{float(screen.width())/screen.height()};
 Camera camera{cameraName, cameraFovDeg, cameraAspectRatio};
 ```
 
-Do make sure to pay attention to your aspect ratio, as it will strecth and squish your resulting image depending on the screen resolution you defined earlier.
+Do make sure to pay attention to your aspect ratio, as it will stretch and squish your resulting image depending on the screen resolution you defined earlier.
 
 When it comes to graphs, however, there are no limitations; every single graph in a scene that is within the vision frustum of the main camera will be drawn. It is worth mentioning that, as we are not bound by OpenGL standards, there is no need for near and far planes in the frustum; your graphs will be drawn even if they're infinitely far away. Magnificent. You can instantiate and populate a graph like so.
 
