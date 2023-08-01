@@ -6,14 +6,20 @@ project(very_basic_ascii_graphics_api
 
 set(CMAKE_CXX_STANDARD 20)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 add_compile_options(-static-libgcc -static-libstdc++)
 add_link_options(-static -static-libgcc -static-libstdc++)
+
+# stuff to compile the app icon along with the executable (remove in case of any problems)
+add_custom_command(
+        OUTPUT icon/vbag_icon.o
+        COMMAND windres ../media/images/icon/vbag_icon.rc -o icon/vbag_icon.o
+        DEPENDS ../media/images/icon/vbag_icon.rc
+)
 
 include_directories(include)
 
 add_executable(VBAG
+        icon/vbag_icon.o # links the icon to the binary (remove if any trouble arises)
         include/animation/animation_engine.hpp
         include/geometry/graph.hpp
         include/math/vector.hpp

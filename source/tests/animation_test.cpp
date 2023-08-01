@@ -52,17 +52,21 @@ void testAnimations() {
     V3F acceleration{};
     V3F rotation{};
 
-    static constexpr auto factor{0.05f};
-    static constexpr V3F gravity{0, 0.1f, 0};
+    static constexpr auto factor{0.1f};
+    static constexpr V3F gravity{0, -1, 0};
 
     // moving the cube
-    if (Input::getKey(KeyCode::W))
+    if (Input::getKey(KeyCode::W) &&
+        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
       acceleration -= cube.transform().forward();
-    if (Input::getKey(KeyCode::A))
+    if (Input::getKey(KeyCode::A) &&
+        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
       acceleration -= cube.transform().right();
-    if (Input::getKey(KeyCode::S))
+    if (Input::getKey(KeyCode::S) &&
+        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
       acceleration += cube.transform().forward();
-    if (Input::getKey(KeyCode::D))
+    if (Input::getKey(KeyCode::D) &&
+        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
       acceleration += cube.transform().right();
     if (Input::getKey(KeyCode::Q))
       rotation += V3F::up();
@@ -70,10 +74,10 @@ void testAnimations() {
       rotation -= V3F::up();
 
     acceleration = acceleration.normalized() * factor;
-    rotation *= factor;
 
     // handling jump after accel normalization
-    if (Input::getKey(KeyCode::Space) && cube.transform().y() <= 0)
+    if (Input::getKey(KeyCode::Space) &&
+        (cube.transform().y() < 0 || isZero(cube.transform().y())))
       acceleration += V3F::up();
 
     // moving the camera
@@ -105,13 +109,16 @@ void testAnimations() {
     cube.transform().rotateInPlace(rotation);
 
     // simulating deceleration by drag
-    velocity *= 0.9f;
+    if (cube.transform().y() < 0 || isZero(cube.transform().y())) {
+      velocity.x *= 0.9f;
+      velocity.z *= 0.9f;
+    }
 
     // applying gravity and detecting collision with the ground plane y = 0
-    if (cube.transform().y() < 0)
+    if (cube.transform().y() < 0 || isZero(cube.transform().y()))
       cube.transform().translate(-V3F::up() * cube.transform().y());
     else
-      velocity -= gravity;
+      velocity += gravity * factor;
 
     // clearing the previous frame
     engine->screen().fill(' ');
@@ -120,6 +127,6 @@ void testAnimations() {
   };
 
   Screen screen{width, height};
-  AnimationEngine engine{screen, setupFunc, loopFunc, scene, 75};
+  AnimationEngine engine{screen, setupFunc, loopFunc, scene, 60};
   engine.run();
 }

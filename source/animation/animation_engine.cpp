@@ -89,6 +89,9 @@ void AnimationEngine::draw(float thickness, char fill) {
     auto start{steady_clock::now()};
     screen_.show();
     loop_(this);
+    // FIXME: IF YOUR CONSOLE IS SLOW TO WRITE, PERFORMANCE MAY BE FUCKED IF YOU
+    //        ENABLE COMPILER OPTIMIZATIONS! A bad solution is to cap the FPS by
+    //        delaying by 16.6ms for 60fps or something even longer if need be.
     delay(frameTime());
     screen_.clear();
     auto end{steady_clock::now()};

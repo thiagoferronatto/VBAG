@@ -40,7 +40,7 @@ public:
 
   /// @brief Clears the screen by printing an escape sequence to the output
   /// stream.
-  auto inline clear() { fputs("\033c", stream_); }
+  auto inline clear() { fputs(/*"\033c"*/ "\033[H", stream_); }
 
   /// @brief Gets the character at the specified position in the screen.
   ///
