@@ -53,7 +53,8 @@ void AnimationEngine::drawLine(V3F a, V3F b, float thickness, char fill) {
   }
 }
 
-void AnimationEngine::drawGraph(const GV3F *g, float thickness, char fill) {
+void AnimationEngine::drawGraph(const std::shared_ptr<GV3F> &g, float thickness,
+                                char fill) {
   auto mainCamera{scene_.mainCamera()};
   if (!mainCamera)
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
@@ -71,10 +72,10 @@ void AnimationEngine::drawGraph(const GV3F *g, float thickness, char fill) {
 
 void AnimationEngine::draw(float thickness, char fill) {
   for (auto &[_, object] : scene_) {
-    auto cameraPointer{dynamic_cast<Camera *>(object)};
+    auto cameraPointer{std::dynamic_pointer_cast<Camera>(object)};
     if (cameraPointer)
       continue;
-    auto graphPointer{dynamic_cast<GV3F *>(object)};
+    auto graphPointer{std::dynamic_pointer_cast<GV3F>(object)};
     // here's where other kinds of objects should be drawn
     if (graphPointer)
       drawGraph(graphPointer, thickness, fill);

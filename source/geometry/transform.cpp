@@ -3,13 +3,10 @@
 #include "geometry/object.hpp"
 #include "graphics/camera.hpp"
 
-Transform::Transform(Object *object) : object_{object} {}
+Transform::Transform(Object &object) : object_{object} {}
 
-Transform::Transform(const M4F &matrix, Object *object)
-    : transform_{matrix}, object_{object} {
-  if (!object)
-    throw RuntimeError<NullPointerToObject>{};
-}
+Transform::Transform(const M4F &matrix, Object &object)
+    : transform_{matrix}, object_{object} {}
 
 float Transform::operator[](size_t index) const {
   return transform_.data[index];
@@ -30,12 +27,12 @@ V3F Transform::operator*(const V3F &vector) const {
 
 void Transform::scale(V3F scales) {
   // cant scale a camera bucko
-  if (dynamic_cast<Camera *>(object_))
+  if (dynamic_cast<Camera *>(&object_))
     return;
   transform_[0] *= scales.x;
   transform_[5] *= scales.y;
   transform_[10] *= scales.z;
-  for (auto child : object_->children())
+  for (const auto &child : object_.children())
     child->transform().scale(scales);
 }
 
@@ -61,9 +58,9 @@ void Transform::rotate(V3F eulerAngles) {
       0,   0,   0,   1,
   };
   transform_ = rotationMatrix * transform_;
-  if (auto cam = dynamic_cast<Camera *>(object_))
+  if (auto cam = dynamic_cast<Camera *>(&object_))
     cam->updateWTC_();
-  for (auto child : object_->children())
+  for (const auto &child : object_.children())
     child->transform().rotate(eulerAngles);
 }
 
@@ -84,9 +81,9 @@ void Transform::translate(V3F translation) {
   transform_[3] += translation.x;
   transform_[7] += translation.y;
   transform_[11] += translation.z;
-  if (auto cam = dynamic_cast<Camera *>(object_))
+  if (auto cam = dynamic_cast<Camera *>(&object_))
     cam->updateWTC_();
-  for (auto child : object_->children())
+  for (const auto &child : object_.children())
     child->transform().translate(translation);
 }
 
@@ -113,4 +110,14 @@ V3F Transform::translation() const { return {x(), y(), z()}; }
 
 M4F Transform::operator*(const Transform &other) const {
   return transform_ * other.transform_;
+}
+
+float Transform::x() const { return transform_[3]; }
+
+float Transform::y() const { return transform_[7]; }
+
+float Transform::z() const { return transform_[11]; }
+
+M4F operator*(const M4F &matrix, const Transform &transform) {
+  return matrix * transform.transform_;
 }

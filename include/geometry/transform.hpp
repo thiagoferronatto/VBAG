@@ -18,19 +18,6 @@ class Object;
 /// components.
 class Transform {
 public:
-  /// @brief Constructs a Transform object associated with the given Object.
-  ///
-  /// @param object A pointer to the Object to which this Transform belongs.
-  explicit Transform(Object *);
-
-  /// @brief Constructs a Transform object with the given transformation matrix
-  /// and associated Object.
-  ///
-  /// @param matrix The 4x4 transformation matrix representing scaling,
-  /// rotation, and translation.
-  /// @param object A pointer to the Object to which this Transform belongs.
-  Transform(const M4F &, Object *);
-
   /// @brief Returns the value at the specified index in the transformation
   /// matrix.
   ///
@@ -140,17 +127,17 @@ public:
   /// @brief Returns the x-coordinate of the translation.
   ///
   /// @return The x-coordinate of the translation.
-  [[nodiscard]] float x() const { return transform_[3]; }
+  [[nodiscard]] float x() const;
 
   /// @brief Returns the y-coordinate of the translation.
   ///
   /// @return The y-coordinate of the translation.
-  [[nodiscard]] float y() const { return transform_[7]; }
+  [[nodiscard]] float y() const;
 
   /// @brief Returns the z-coordinate of the translation.
   ///
   /// @return The z-coordinate of the translation.
-  [[nodiscard]] float z() const { return transform_[11]; }
+  [[nodiscard]] float z() const;
 
   /// @brief Friend function to perform matrix multiplication between a matrix
   /// and a Transform.
@@ -158,17 +145,29 @@ public:
   /// @param matrix The 4x4 matrix to be multiplied with the Transform.
   /// @param transform The Transform to be multiplied with the matrix.
   /// @return The resulting 4x4 matrix after the multiplication.
-  [[nodiscard]] friend M4F operator*(const M4F &matrix,
-                                     const Transform &transform) {
-    return matrix * transform.transform_;
-  }
+  friend M4F operator*(const M4F &, const Transform &);
 
 private:
-  M4F transform_{1, 0, 0, 0,  //
-                 0, 1, 0, 0,  //
-                 0, 0, 1, 0,  //
-                 0, 0, 0, 1}; ///< The 4x4 transformation matrix.
-  Object *object_;            ///< Pointer to the associated Object.
+  friend class Object;
+
+  /// @brief Constructs a Transform object associated with the given Object.
+  ///
+  /// @param object A pointer to the Object to which this Transform belongs.
+  explicit Transform(Object &);
+
+  /// @brief Constructs a Transform object with the given transformation matrix
+  /// and associated Object.
+  ///
+  /// @param matrix The 4x4 transformation matrix representing scaling,
+  /// rotation, and translation.
+  /// @param object A pointer to the Object to which this Transform belongs.
+  Transform(const M4F &, Object &);
+
+  M4F transform_{1, 0, 0, 0, //
+                 0, 1, 0, 0, //
+                 0, 0, 1, 0, //
+                 0, 0, 0, 1};///< The 4x4 transformation matrix.
+  Object &object_;            ///< Pointer to the associated Object.
 };
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_TRANSFORM_HPP

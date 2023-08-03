@@ -55,7 +55,7 @@ public:
   /// @param g A pointer to the object representing the graph.
   /// @param thickness The thickness of the graph (default is 3).
   /// @param fill The character representing the graph (default is '#').
-  void drawGraph(const GV3F *, float = 3, char = '#');
+  void drawGraph(const std::shared_ptr<GV3F> &, float = 3, char = '#');
 
   /// @brief Draws the current scene on the screen.
   ///
