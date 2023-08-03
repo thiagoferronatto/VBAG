@@ -74,6 +74,7 @@ void testAnimations() {
       rotation -= V3F::up();
 
     acceleration = acceleration.normalized() * factor;
+    rotation *= engine->deltaTime();
 
     // handling jump after accel normalization
     if (Input::getKey(KeyCode::Space) &&
