@@ -1,7 +1,6 @@
 #ifndef VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_OBJECT_HPP
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_OBJECT_HPP
 
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -39,12 +38,12 @@ public:
   /// @brief Returns a constant pointer to the parent of the object.
   ///
   /// @return A constant pointer to the parent object.
-  [[nodiscard]] const std::shared_ptr<Object>& parent() const;
+  [[nodiscard]] const Object *parent() const;
 
   /// @brief Returns a constant reference to the vector of children objects.
   ///
   /// @return A constant reference to the vector of children objects.
-  [[nodiscard]] const std::vector<std::shared_ptr<Object>> &children() const;
+  [[nodiscard]] const std::vector<Object *> &children() const;
 
   /// @brief Returns the name of the object.
   ///
@@ -58,19 +57,18 @@ public:
   /// @throw ChildIsSameAsParent if newChild is the same as the current object.
   /// @throw ChildHasSameNameAsParent if newChild has the same name as the
   /// current object.
-  void addChild(std::shared_ptr<Object>);
+  void addChild(Object *);
 
   /// @brief Removes a child object from the current object's list of children.
   ///
   /// @param child The pointer to the child object to be removed.
-  void removeChild(std::shared_ptr<Object>);
+  void removeChild(Object *);
 
 protected:
-  Transform transform_{*this};        ///< The transform of the object.
-  std::shared_ptr<Object> parent_{}; ///< Pointer to the parent object.
-  std::vector<std::shared_ptr<Object>>
-      children_;     ///< Vector of pointers to child objects.
-  std::string name_; ///< The name of the object.
+  Transform transform_{this};      ///< The transform of the object.
+  Object *parent_{};               ///< Pointer to the parent object.
+  std::vector<Object *> children_; ///< Vector of pointers to child objects.
+  std::string name_;               ///< The name of the object.
 };
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_OBJECT_HPP

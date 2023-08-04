@@ -22,16 +22,16 @@ void testAnimations() {
 
   Scene scene;
 
-  auto g{std::make_shared<GV3F>(GV3F::cube("cube"))};
-  auto h{std::make_shared<GV3F>(GV3F::cube("lil_cube"))};
-  auto i{std::make_shared<GV3F>(GV3F::cube("static_cube"))};
-  auto camera{std::make_shared<Camera>(
-      "main_camera", 3, Screen::stretchFactor * float(width) / float(height))};
+  // a graph that will hold our shape
+  GV3F g{GV3F::cube("cube")}, h{GV3F::cube("lil_cube")},
+      i{GV3F::cube("static_cube")};
+  Camera camera{"main_camera", 3,
+                Screen::stretchFactor * float(width) / float(height)};
 
-  g->addChild(h);
-  g->addChild(camera);
-  scene.addObject(g); // automatically adds all of g's children
-  scene.addObject(i);
+  g.addChild(&h);
+  g.addChild(&camera);
+  scene.addObject(&g); // automatically adds all of g's children
+  scene.addObject(&i);
   scene.setMainCamera("main_camera");
 
   auto &cube{*scene.object("cube")};
