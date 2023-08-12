@@ -6,9 +6,6 @@ project(very_basic_ascii_graphics_api
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_compile_options(-static-libgcc -static-libstdc++)
-add_link_options(-static -static-libgcc -static-libstdc++)
-
 # stuff to compile the app icon along with the executable (remove in case of any problems)
 add_custom_command(
         OUTPUT icon/vbag_icon.o

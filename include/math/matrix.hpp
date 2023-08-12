@@ -58,7 +58,7 @@ public:
   ///
   /// @return A new matrix with all elements negated.
   Matrix operator-() const {
-    return unaryOperationResult(*this, std::negate{});
+    return unaryOperationResult(*this, [](T elem) { return -elem; });
   }
 
   /// @brief Adds another matrix to this matrix (element-wise addition).
