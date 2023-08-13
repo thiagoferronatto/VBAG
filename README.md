@@ -1,14 +1,16 @@
-# Very Basic ASCII Graphics (VBAG) API
+# [README IS A WIP] Very Basic Game Engine (VBAG)
 
-https://github.com/thiagoferronatto/VBAG/assets/31262053/b8568e66-7834-4a8d-be12-3e8daf725203
+I know that "VBAG" doesn't match the actual title, but it did before and sounds way cooler than "VBGE".
+
+https://github.com/thiagoferronatto/VBAG/assets/31262053/da4c1b7e-8006-42aa-b0a1-7bea880634cb
 
 ## 1. Overview
 
-VBAG is a boredom-induced holiday project turned game engine, capable of rendering (more on that below) scenes in 3D and projecting them into your console window while simultaneously processing user keyboard inputs in real time.
+VBAG is a boredom-induced holiday project turned game engine, capable of rendering wireframe scenes in 3D and projecting them into ~your console window~ **an actual graphical window** while simultaneously processing user keyboard inputs in real time.
 
 ## 2. Installation
 
-It shouldn't be hard to try the demo at all; just download the Windows executable from the Releases section and you're probably good to go! Unfortunately I had to use the Windows API to handle user inputs, because that was the easiest way for me to do it while maintaining good response times. If you have some ideas for dealing with keyboard inputs in a cross-platform way, please feel free to try and implement them!
+PENDING.
 
 ## 3. Usage
 
@@ -16,9 +18,7 @@ To actually make something useful with this, you'll have to download the source 
 
 ### 3.1. Compilation
 
-To use the CMakeLists.txt I provided, you'll probably need MinGW64 on your windows machine; what I am sure of is that you will at least have to use GCC. However, if you feel comfortable with drifting away from CMake, then the world is your oyster; use your preferred build system with your preferred compiler, as long as it has support for the Windows API.
-
-You will notice that there are build rules for the application icon. That may be left out of your compilation endeavors, as it is for entirely aesthetic purposes.
+PENDING.
 
 ### 3.2. Writing your own scripts
 
@@ -79,15 +79,7 @@ private:
 
 #### 3.2.2. Screens
 
-To actually run the scripts, you'll need a Screen to render your stuff onto. Getting that is pretty simple.
-
-```cpp
-#include "output/screen.hpp"
-
-Screen screen{200, 100};
-```
-
-Notice that you can specify a resolution that works best for you, but it should be kept small; there ain't no GPU accelerated rendering pipeline here.
+PENDING.
 
 #### 3.2.3. Scenes
 
