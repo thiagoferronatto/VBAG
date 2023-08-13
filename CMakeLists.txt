@@ -15,12 +15,12 @@ add_custom_command(
 
 include_directories(include)
 
-add_executable(VBAG
+add_executable(VBAG WIN32
         icon/vbag_icon.o # links the icon to the binary (remove if any trouble arises)
         include/animation/animation_engine.hpp
         include/geometry/graph.hpp
         include/math/vector.hpp
-        include/output/screen.hpp
+        include/output/d3d9_screen.hpp
         include/tests/animation_test.hpp
         source/animation/animation_engine.cpp
         source/tests/animation_test.cpp
@@ -38,3 +38,5 @@ add_executable(VBAG
         source/input/input.cpp
         include/input/input.hpp
         source/geometry/object.cpp)
+
+target_link_libraries(VBAG d3d9.lib)

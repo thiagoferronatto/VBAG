@@ -3,21 +3,9 @@
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
 #include "input/input.hpp"
-#include "output/screen.hpp"
+#include "output/d3d9_screen.hpp"
 
-void testAnimations() {
-  fputs("WASD to move the cube.\n"
-        "Q and E to rotate the cube about the y axis.\n"
-        "Spacebar to make the cube jump.\n"
-        "IJKL to move the camera.\n"
-        "U and O to rotate the camera about the y axis.\n"
-        "N and M to rotate the camera about the x axis.\n"
-        "Escape to close the application.\n"
-        "Type a resolution to start (eg.: 100x25): ",
-        stdout);
-  size_t width, height;
-  scanf_s("%zux%zu", &width, &height);
-
+void testAnimations(HINSTANCE instance) {
   V3F velocity{};
 
   Scene scene;
@@ -25,8 +13,7 @@ void testAnimations() {
   // a graph that will hold our shape
   GV3F g{GV3F::cube("cube")}, h{GV3F::cube("lil_cube")},
       i{GV3F::cube("static_cube")};
-  Camera camera{"main_camera", 3,
-                Screen::stretchFactor * float(width) / float(height)};
+  Camera camera{"main_camera", 0.25, float(800) / float(600)};
 
   g.addChild(&h);
   g.addChild(&camera);
@@ -44,7 +31,7 @@ void testAnimations() {
     staticCube.transform().translate(0, 1, 0);
     lilCube.transform().scale(.5, .5, .5);
     lilCube.transform().translate(0, 1.5, 0);
-    mainCam.transform().translate(0, 0, 10);
+    mainCam.transform().translate(2, 3, 10);
   };
 
   auto loopFunc = [&](AnimationEngine *engine) {
@@ -52,8 +39,8 @@ void testAnimations() {
     V3F acceleration{};
     V3F rotation{};
 
-    static constexpr auto factor{0.1f};
-    static constexpr V3F gravity{0, -1, 0};
+    static constexpr auto factor{0.5f};
+    static constexpr V3F gravity{0, -0.75, 0};
 
     // moving the cube
     if (Input::getKey(KeyCode::W) &&
@@ -73,31 +60,33 @@ void testAnimations() {
     if (Input::getKey(KeyCode::E))
       rotation -= V3F::up();
 
-    acceleration = acceleration.normalized() * factor;
+    acceleration = acceleration.normalized() * factor * engine->deltaTime();
     rotation *= engine->deltaTime();
 
     // handling jump after accel normalization
     if (Input::getKey(KeyCode::Space) &&
         (cube.transform().y() < 0 || isZero(cube.transform().y())))
-      acceleration += V3F::up();
+      acceleration += V3F::up() * 0.25;
 
     // moving the camera
     if (Input::getKey(KeyCode::I))
-      mainCam.transform().translate(V3F::up() * factor);
+      mainCam.transform().translate(V3F::up() * engine->deltaTime());
     if (Input::getKey(KeyCode::J))
-      mainCam.transform().translate(-V3F::right() * factor);
+      mainCam.transform().translate(-V3F::right() * engine->deltaTime());
     if (Input::getKey(KeyCode::K))
-      mainCam.transform().translate(-V3F::up() * factor);
+      mainCam.transform().translate(-V3F::up() * engine->deltaTime());
     if (Input::getKey(KeyCode::L))
-      mainCam.transform().translate(V3F::right() * factor);
+      mainCam.transform().translate(V3F::right() * engine->deltaTime());
     if (Input::getKey(KeyCode::U))
-      mainCam.transform().rotateInPlace(V3F::up() * factor);
+      mainCam.transform().rotateInPlace(V3F::up() * engine->deltaTime());
     if (Input::getKey(KeyCode::O))
-      mainCam.transform().rotateInPlace(-V3F::up() * factor);
+      mainCam.transform().rotateInPlace(-V3F::up() * engine->deltaTime());
     if (Input::getKey(KeyCode::N))
-      mainCam.transform().rotateInPlace(-mainCam.transform().right() * factor);
+      mainCam.transform().rotateInPlace(-mainCam.transform().right() *
+                                        engine->deltaTime());
     if (Input::getKey(KeyCode::M))
-      mainCam.transform().rotateInPlace(mainCam.transform().right() * factor);
+      mainCam.transform().rotateInPlace(mainCam.transform().right() *
+                                        engine->deltaTime());
 
     if (Input::getKey(KeyCode::Escape))
       exit(0);
@@ -111,23 +100,18 @@ void testAnimations() {
 
     // simulating deceleration by drag
     if (cube.transform().y() < 0 || isZero(cube.transform().y())) {
-      velocity.x *= 0.9f;
-      velocity.z *= 0.9f;
+      velocity.x *= std::pow(0.1f, engine->deltaTime());
+      velocity.z *= std::pow(0.1f, engine->deltaTime());
     }
 
     // applying gravity and detecting collision with the ground plane y = 0
     if (cube.transform().y() < 0 || isZero(cube.transform().y()))
       cube.transform().translate(-V3F::up() * cube.transform().y());
     else
-      velocity += gravity * factor;
-
-    // clearing the previous frame
-    engine->screen().fill(' ');
-
-    engine->draw(.5);
+      velocity += gravity * engine->deltaTime();
   };
 
-  Screen screen{width, height};
-  AnimationEngine engine{screen, setupFunc, loopFunc, scene, 60};
+  D3D9Screen screen{instance, "VBAG Demo", 800, 600};
+  AnimationEngine engine{screen, setupFunc, loopFunc, scene};
   engine.run();
 }

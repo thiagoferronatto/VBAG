@@ -10,6 +10,8 @@ Camera::Camera(const std::string &name, float fovDeg, float aspectRatio)
   static auto fovRad{fovDeg_ * (std::numbers::pi_v<float> / 180.0f)};
   static auto xFactor{aspectRatio_ / std::tan(fovRad / 2.0f)},
       yFactor{1.0f / std::tan(fovRad / 2.0f)};
+  static float zFactor{(-0.1 - 100) / (0.1 - 100)},
+      zTerm{2 * 100 * 0.1 / (0.1 - 100)};
   // perspective projection matrix stolen and adapted from
   // https://ogldev.org/www/tutorial12/tutorial12.html
   static M4F perspectiveMatrix{xFactor, 0,       0,  0, //

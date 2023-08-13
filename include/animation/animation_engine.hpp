@@ -9,7 +9,7 @@
 #include "geometry/graph.hpp"
 #include "geometry/scene.hpp"
 #include "graphics/camera.hpp"
-#include "output/screen.hpp"
+#include "output/d3d9_screen.hpp"
 
 /// @class AnimationEngine
 /// @brief The AnimationEngine class provides a framework for creating and
@@ -24,10 +24,10 @@ class AnimationEngine {
 public:
   /// @brief Alias for a function pointer used in setup and loop animations.
   ///
-  /// An AnimFunc represents a function pointer that takes an AnimationEngine*
+  /// An RenderFunc represents a function pointer that takes an AnimationEngine*
   /// as an argument. It is used to define setup and loop animations for the
   /// AnimationEngine.
-  using AnimFunc = std::function<void(AnimationEngine *)>;
+  using RenderFunc = std::function<void(AnimationEngine *)>;
 
   /// @brief Constructs an AnimationEngine object with the given parameters.
   ///
@@ -40,15 +40,7 @@ public:
   /// @param scene The initial scene to be displayed.
   /// @param frameRate The desired frame rate for the animation (default
   /// is 60.0).
-  AnimationEngine(Screen &, AnimFunc, AnimFunc, Scene, float = 60.0F);
-
-  /// @brief Draws a line on the screen between two 3D vectors.
-  ///
-  /// @param a The starting point of the line.
-  /// @param b The ending point of the line.
-  /// @param thickness The thickness of the line (default is 3).
-  /// @param fill The character representing the line (default is '#').
-  void drawLine(V3F, V3F, float = 3, char = '#');
+  AnimationEngine(Screen &, RenderFunc, RenderFunc, Scene, float = 60.0F);
 
   /// @brief Draws a graph on the screen.
   ///
@@ -110,8 +102,8 @@ public:
 private:
   Screen &screen_;    ///< Reference to the Screen object used for rendering.
   Scene scene_;       ///< The current scene being displayed.
-  AnimFunc setup_;    ///< The setup animation function.
-  AnimFunc loop_;     ///< The loop animation function.
+  RenderFunc setup_;  ///< The setup animation function.
+  RenderFunc loop_;   ///< The loop animation function.
   float frameRate_;   ///< The desired frame rate for the animation.
   float deltaTime_{}; ///< The time elapsed between the current and previous
                       ///< animation frame.
