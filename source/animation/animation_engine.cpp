@@ -19,7 +19,7 @@ AnimationEngine::AnimationEngine(Screen &screen, RenderFunc setup,
     : screen_{screen}, scene_{std::move(scene)}, setup_{std::move(setup)},
       loop_{std::move(loop)}, frameRate_{frameRate} {}
 
-void AnimationEngine::drawGraph(const GV3F *g, float, char fill) {
+void AnimationEngine::drawGraph(const GV3F *g, float, char) {
   auto mainCamera{scene_.mainCamera()};
   if (!mainCamera)
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
@@ -54,18 +54,28 @@ void AnimationEngine::draw(float thickness, char fill) {
 }
 
 [[noreturn]] void AnimationEngine::run() {
-  using namespace std::chrono;
-  setup_(this);
-  while (true) {
-    auto start{steady_clock::now()};
-    loop_(this);
-    screen_.clear();
-    draw();
-    screen_.present();
-    auto end{steady_clock::now()};
-    auto elapsedMs{duration_cast<milliseconds>(end - start)};
-    deltaTime_ = float(elapsedMs.count()) / 1e3f;
+  auto renderThread{std::thread{[&]() {
+    using namespace std::chrono;
+    setup_(this);
+    while (true) {
+      auto start{steady_clock::now()};
+      loop_(this);
+      screen_.clear();
+      draw();
+      screen_.present();
+      auto end{steady_clock::now()};
+      auto elapsedMs{duration_cast<milliseconds>(end - start)};
+      deltaTime_ = float(elapsedMs.count()) / 1e3f;
+    }
+  }}};
+
+  MSG msg{};
+  while (GetMessage(&msg, nullptr, 0, 0) > 0) {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
   }
+
+  renderThread.join();
 }
 
 [[nodiscard]] inline float AnimationEngine::frameRate() const {

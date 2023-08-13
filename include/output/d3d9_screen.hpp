@@ -96,14 +96,17 @@ public:
   void drawLine(V3F a, V3F b) override {
     struct Vertex {
       float x, y, z, rhw;
+      D3DCOLOR color;
     };
+    constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
 
-    const Vertex vertices[2]{{a.x, a.y, a.z, 1}, {b.x, b.y, b.z, 1}};
+    const Vertex vertices[2]{{a.x, a.y, a.z, 1, D3DCOLOR_XRGB(255, 0, 0)},
+                             {b.x, b.y, b.z, 1, D3DCOLOR_XRGB(0, 0, 255)}};
 
-    device_->SetFVF(D3DFVF_XYZRHW);
+    device_->SetFVF(VertexType);
 
     IDirect3DVertexBuffer9 *vertexBuffer;
-    device_->CreateVertexBuffer(2 * sizeof(Vertex), 0, D3DFVF_XYZRHW,
+    device_->CreateVertexBuffer(2 * sizeof(Vertex), 0, VertexType,
                                 D3DPOOL_DEFAULT, &vertexBuffer, nullptr);
 
     void *vertexBufferData;
@@ -145,7 +148,7 @@ private:
     case WM_CLOSE:
     case WM_DESTROY:
       PostQuitMessage(0);
-      return 0;
+      exit(0); // this is dirty
     default:
       return DefWindowProc(window, msg, wParam, lParam);
     }
