@@ -18,7 +18,9 @@ public:
   virtual void clear() = 0;
   [[nodiscard]] virtual size_t width() const = 0;
   [[nodiscard]] virtual size_t height() const = 0;
-  virtual void drawLine(V3F, V3F) = 0;
+  virtual void drawLine(V3F a, V3F b, D3DCOLOR color) = 0;
+  virtual void drawTriangle(V3F v1, V3F v2, V3F v3, D3DCOLOR c1, D3DCOLOR c2,
+                            D3DCOLOR c3) = 0;
   virtual void present() = 0;
   virtual HWND window() = 0;
 
@@ -93,36 +95,57 @@ public:
     d3d_->Release();
   }
 
-  void drawLine(V3F a, V3F b) override {
+  void drawLine(V3F a, V3F b, D3DCOLOR color) override {
     struct Vertex {
       float x, y, z, rhw;
-      D3DCOLOR color;
+      D3DCOLOR diffuse;
     };
     constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
 
-    const Vertex vertices[2]{{a.x, a.y, a.z, 1, D3DCOLOR_XRGB(255, 0, 0)},
-                             {b.x, b.y, b.z, 1, D3DCOLOR_XRGB(0, 0, 255)}};
+    const Vertex vertices[2]{{a.x, a.y, a.z, 1, color},
+                             {b.x, b.y, b.z, 1, color}};
 
     device_->SetFVF(VertexType);
 
     IDirect3DVertexBuffer9 *vertexBuffer;
     device_->CreateVertexBuffer(2 * sizeof(Vertex), 0, VertexType,
                                 D3DPOOL_DEFAULT, &vertexBuffer, nullptr);
-
     void *vertexBufferData;
     vertexBuffer->Lock(0, 2 * sizeof(Vertex), &vertexBufferData, 0);
     memcpy(vertexBufferData, vertices, 2 * sizeof(Vertex));
     vertexBuffer->Unlock();
-
-    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
     device_->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
-
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
     device_->BeginScene();
-
     device_->DrawPrimitive(D3DPT_LINELIST, 0, 1);
-
     device_->EndScene();
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+    vertexBuffer->Release();
+  }
 
+  void drawTriangle(V3F v1, V3F v2, V3F v3, D3DCOLOR c1, D3DCOLOR c2,
+                    D3DCOLOR c3) override {
+    struct Vertex {
+      float x, y, z, rhw;
+      D3DCOLOR diffuse;
+    };
+    constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
+    const Vertex vertices[3]{{v1.x, v1.y, v1.z, 1, c1},
+                             {v2.x, v2.y, v2.z, 1, c2},
+                             {v3.x, v3.y, v3.z, 1, c3}};
+    device_->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    IDirect3DVertexBuffer9 *vertexBuffer;
+    device_->CreateVertexBuffer(3 * sizeof(Vertex), 0, VertexType,
+                                D3DPOOL_DEFAULT, &vertexBuffer, nullptr);
+    void *vertexBufferData;
+    vertexBuffer->Lock(0, 3 * sizeof(Vertex), &vertexBufferData, 0);
+    memcpy(vertexBufferData, vertices, 3 * sizeof(Vertex));
+    vertexBuffer->Unlock();
+    device_->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+    device_->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+    device_->BeginScene();
+    device_->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+    device_->EndScene();
     vertexBuffer->Release();
   }
 

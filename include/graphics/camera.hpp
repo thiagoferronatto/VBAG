@@ -18,8 +18,8 @@ public:
   ///
   /// @param name The name of the camera.
   /// @param fovDeg The field of view angle in degrees.
-  /// @param aspectRatio The aspect ratio of the camera's view (width/height).
-  Camera(const std::string &, float, float);
+  /// @param pixelAspectRatio_ The aspect ratio of the camera's view (width/height).
+  Camera(const std::string &name, float fovDeg, float pixelAspectRatio_);
 
   /// @brief Returns the perspective projection matrix of the camera.
   ///

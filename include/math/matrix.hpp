@@ -122,6 +122,26 @@ public:
   /// @return The number of columns in the matrix.
   [[nodiscard]] size_t width() const { return w; }
 
+  /// @brief Assumes this is a MV transform matrix.
+  /// @return The transpose of the inverse of this matrix.
+  Matrix transposeOfInverse() const {
+    // TODO: make sure this is right
+    const auto den{operator()(0, 2) * operator()(1, 1) * operator()(2, 0) -
+                   operator()(0, 1) * operator()(1, 2) * operator()(2, 0) -
+                   operator()(0, 2) * operator()(1, 0) * operator()(2, 1) +
+                   operator()(0, 0) * operator()(1, 2) * operator()(2, 1) +
+                   operator()(0, 1) * operator()(1, 0) * operator()(2, 2) -
+                   operator()(0, 0) * operator()(1, 1) * operator()(2, 2)};
+    // clang-format off
+    return {
+        (operator()(1,2)*operator()(2,1)-operator()(1,1)*operator()(2,2))  / den,  (-operator()(1,2)*operator()(2,0)+operator()(1,0)*operator()(2,2)) / den, (operator()(1,1)*operator()(2,0)-operator()(1,0)*operator()(2,1))  / den, 0,
+        (-operator()(0,2)*operator()(2,1)+operator()(0,1)*operator()(2,2)) / den,  (operator()(0,2)*operator()(2,0)-operator()(0,0)*operator()(2,2))  / den, (-operator()(0,1)*operator()(2,0)+operator()(0,0)*operator()(2,1)) / den, 0,
+        (operator()(0,2)*operator()(1,1)-operator()(0,1)*operator()(1,2))  / den,  (-operator()(0,2)*operator()(1,0)+operator()(0,0)*operator()(1,2)) / den, (operator()(0,1)*operator()(1,0)-operator()(0,0)*operator()(1,1))  / den, 0,
+        0,                                                                         0,                                                                        0,                                                                        1
+    };
+    // clang-format on
+  }
+
   /// @brief The one-dimensional array storing the matrix elements in row-major
   /// order.
   T data[h * w];

@@ -9,6 +9,7 @@
 #include "geometry/graph.hpp"
 #include "geometry/scene.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/triangle_mesh.hpp"
 #include "output/d3d9_screen.hpp"
 
 /// @class AnimationEngine
@@ -40,14 +41,17 @@ public:
   /// @param scene The initial scene to be displayed.
   /// @param frameRate The desired frame rate for the animation (default
   /// is 60.0).
-  AnimationEngine(Screen &, RenderFunc, RenderFunc, Scene, float = 60.0F);
+  AnimationEngine(Screen &screen, RenderFunc setup, RenderFunc loop,
+                  Scene scene, float frameRate = 60.0F);
 
   /// @brief Draws a graph on the screen.
   ///
   /// @param g A pointer to the object representing the graph.
   /// @param thickness The thickness of the graph (default is 3).
   /// @param fill The character representing the graph (default is '#').
-  void drawGraph(const GV3F *, float = 3, char = '#');
+  void drawGraph(const GV3F *g, float thickness = 3, char fill = '#');
+
+  void drawMesh(const TriangleMesh *mesh);
 
   /// @brief Draws the current scene on the screen.
   ///

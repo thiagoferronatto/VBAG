@@ -2,13 +2,17 @@
 
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
+#include "graphics/light.hpp"
+#include "graphics/triangle_mesh.hpp"
 #include "input/input.hpp"
 #include "output/d3d9_screen.hpp"
 
 void testAnimations(HINSTANCE instance) {
-  V3F velocity{};
 
   Scene scene;
+
+#if false
+  V3F velocity{};
 
   // a graph that will hold our shape
   GV3F g{GV3F::cube("cube")}, h{GV3F::cube("lil_cube")},
@@ -25,7 +29,6 @@ void testAnimations(HINSTANCE instance) {
   auto &lilCube{*scene.object("lil_cube")};
   auto &staticCube{*scene.object("static_cube")};
   auto &mainCam{*scene.mainCamera()};
-
   auto setupFunc = [&](AnimationEngine *engine) {
     staticCube.transform().scale(2, 2, 2);
     staticCube.transform().translate(0, 1, 0);
@@ -66,7 +69,7 @@ void testAnimations(HINSTANCE instance) {
     // handling jump after accel normalization
     if (Input::getKey(KeyCode::Space) &&
         (cube.transform().y() < 0 || isZero(cube.transform().y())))
-      acceleration += V3F::up() * 0.25;
+      acceleration += V3F::up() * 20 * engine->deltaTime();
 
     // moving the camera
     if (Input::getKey(KeyCode::I))
@@ -110,6 +113,87 @@ void testAnimations(HINSTANCE instance) {
     else
       velocity += gravity * engine->deltaTime();
   };
+#else
+  TriangleMesh mesh{"bah"};
+  mesh.addVertex(-1, -1, 1);
+  mesh.addVertex(1, -1, 1);
+  mesh.addVertex(1, 1, 1);
+  mesh.addVertex(-1, 1, 1);
+  mesh.addVertex(-1, 1, -1);
+  mesh.addVertex(1, 1, -1);
+  mesh.addVertex(1, -1, -1);
+  mesh.addVertex(-1, -1, -1);
+
+  mesh.addNormal(mesh.vertices()[0]);
+  mesh.addNormal(mesh.vertices()[1]);
+  mesh.addNormal(mesh.vertices()[2]);
+  mesh.addNormal(mesh.vertices()[3]);
+  mesh.addNormal(mesh.vertices()[4]);
+  mesh.addNormal(mesh.vertices()[5]);
+  mesh.addNormal(mesh.vertices()[6]);
+  mesh.addNormal(mesh.vertices()[7]);
+
+  mesh.addTriangle(0, 1, 2);
+  mesh.addTriangle(0, 2, 3);
+  mesh.addTriangle(1, 6, 5);
+  mesh.addTriangle(1, 5, 2);
+  mesh.addTriangle(6, 7, 4);
+  mesh.addTriangle(6, 4, 5);
+  mesh.addTriangle(7, 0, 3);
+  mesh.addTriangle(7, 3, 4);
+  mesh.addTriangle(7, 6, 1);
+  mesh.addTriangle(7, 1, 0);
+  mesh.addTriangle(3, 2, 5);
+  mesh.addTriangle(3, 5, 4);
+
+  scene.addObject(&mesh);
+
+  PointLight light{"point_light"};
+  scene.addObject(&light);
+
+  // TODO: figure out why the aspect ratio is squishing stuff
+  Camera camera{"cam", 60, 600.0f / 800};
+  scene.addObject(&camera);
+  scene.setMainCamera("cam");
+
+  auto setupFunc = [&](AnimationEngine *engine) {
+    camera.transform().translate(0, 0, 6);
+    light.transform().translate(-10, 10, 10);
+  };
+
+  auto loopFunc = [&](AnimationEngine *engine) {
+    if (Input::getKey(KeyCode::W))
+      camera.transform().translate(-5 * camera.transform().forward() *
+                                   engine->deltaTime());
+    if (Input::getKey(KeyCode::A))
+      camera.transform().translate(-5 * camera.transform().right() *
+                                   engine->deltaTime());
+    if (Input::getKey(KeyCode::S))
+      camera.transform().translate(5 * camera.transform().forward() *
+                                   engine->deltaTime());
+    if (Input::getKey(KeyCode::D))
+      camera.transform().translate(5 * camera.transform().right() *
+                                   engine->deltaTime());
+    if (Input::getKey(KeyCode::Space))
+      camera.transform().translate(5 * V3F::up() * engine->deltaTime());
+    if (Input::getKey(KeyCode::LShift))
+      camera.transform().translate(-5 * V3F::up() * engine->deltaTime());
+
+    if (Input::getKey(KeyCode::Q))
+      camera.transform().rotateInPlace(V3F::up() * engine->deltaTime());
+    if (Input::getKey(KeyCode::E))
+      camera.transform().rotateInPlace(-V3F::up() * engine->deltaTime());
+    if (Input::getKey(KeyCode::R))
+      camera.transform().rotateInPlace(camera.transform().right() *
+                                       engine->deltaTime());
+    if (Input::getKey(KeyCode::F))
+      camera.transform().rotateInPlace(-camera.transform().right() *
+                                       engine->deltaTime());
+
+    if (Input::getKey(KeyCode::Escape))
+      exit(0);
+  };
+#endif
 
   D3D9Screen screen{instance, "VBAG Demo", 800, 600};
   AnimationEngine engine{screen, setupFunc, loopFunc, scene};

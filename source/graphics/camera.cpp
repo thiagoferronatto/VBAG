@@ -1,8 +1,8 @@
 #include "graphics/camera.hpp"
 #include <numbers>
 
-Camera::Camera(const std::string &name, float fovDeg, float aspectRatio)
-    : Object(name), fovDeg_{fovDeg}, aspectRatio_{aspectRatio} {
+Camera::Camera(const std::string &name, float fovDeg, float pixelAspectRatio_)
+    : Object(name), fovDeg_{fovDeg}, aspectRatio_{pixelAspectRatio_} {
   updateWTC_();
 }
 

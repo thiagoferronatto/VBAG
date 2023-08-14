@@ -21,14 +21,14 @@ public:
   /// @throw NullPointerToObject if object is a null pointer.
   /// @throw ObjectWithSameNameAlreadyInScene if an object with the same name is
   /// already present in the scene.
-  void addObject(Object *);
+  void addObject(Object *object);
 
   /// @brief Removes an object from the scene.
   ///
   /// @param name The name of the object to be removed from the scene.
   /// @throw std::out_of_range if the object with the specified name is not
   /// found in the scene.
-  void removeObject(const std::string &);
+  void removeObject(const std::string &name);
 
   /// @brief Sets the main camera for the scene.
   ///
@@ -36,7 +36,7 @@ public:
   /// camera.
   /// @throw NamedObjectIsNotACamera if the object with the specified name is
   /// not a Camera.
-  void setMainCamera(const std::string &);
+  void setMainCamera(const std::string &cameraName);
 
   /// @brief Returns a pointer to the object with the specified name in the
   /// scene.
@@ -45,7 +45,7 @@ public:
   /// @throw std::out_of_range if the object with the specified name is not
   /// found in the scene.
   /// @return A pointer to the object if found.
-  [[nodiscard]] Object *object(const std::string &);
+  [[nodiscard]] Object *object(const std::string &name);
 
   /// @brief Returns a constant pointer to the main camera in the scene.
   ///

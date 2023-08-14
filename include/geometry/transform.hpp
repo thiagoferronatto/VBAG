@@ -12,9 +12,9 @@ class Object;
 /// space.
 ///
 /// The Transform class stores the transformation matrix of an object, which
-/// includes scaling, rotation, and translation. It provides functions to apply
+/// includes scaling, rotation, and position. It provides functions to apply
 /// transformations to an object's position and orientation and retrieve the
-/// object's forward, right, and up vectors, as well as the translation
+/// object's forward, right, and up vectors, as well as the position
 /// components.
 class Transform {
 public:
@@ -27,7 +27,7 @@ public:
   /// and associated Object.
   ///
   /// @param matrix The 4x4 transformation matrix representing scaling,
-  /// rotation, and translation.
+  /// rotation, and position.
   /// @param object A pointer to the Object to which this Transform belongs.
   Transform(const M4F &, Object *);
 
@@ -102,18 +102,18 @@ public:
   /// @param zr The rotation angle around the z-axis (roll) in radians.
   void rotateInPlace(float, float, float);
 
-  /// @brief Translates the object by the given translation vector.
+  /// @brief Translates the object by the given position vector.
   ///
-  /// @param translation A 3D vector representing the translation in x, y, and z
+  /// @param translation A 3D vector representing the position in x, y, and z
   /// axes.
   void translate(V3F);
 
-  /// @brief Translates the object by the given translation values in x, y, and
+  /// @brief Translates the object by the given position values in x, y, and
   /// z axes.
   ///
-  /// @param xt The translation in the x-axis.
-  /// @param yt The translation in the y-axis.
-  /// @param zt The translation in the z-axis.
+  /// @param xt The position in the x-axis.
+  /// @param yt The position in the y-axis.
+  /// @param zt The position in the z-axis.
   void translate(float, float, float);
 
   /// @brief Returns the forward vector of the object's orientation.
@@ -131,25 +131,25 @@ public:
   /// @return The up vector of the object's orientation.
   [[nodiscard]] V3F up() const;
 
-  /// @brief Returns the translation components of the transformation as a 3D
+  /// @brief Returns the position components of the transformation as a 3D
   /// vector.
   ///
-  /// @return The translation components of the transformation.
-  [[nodiscard]] V3F translation() const;
+  /// @return The position components of the transformation.
+  [[nodiscard]] V3F position() const;
 
-  /// @brief Returns the x-coordinate of the translation.
+  /// @brief Returns the x-coordinate of the position.
   ///
-  /// @return The x-coordinate of the translation.
+  /// @return The x-coordinate of the position.
   [[nodiscard]] float x() const { return transform_[3]; }
 
-  /// @brief Returns the y-coordinate of the translation.
+  /// @brief Returns the y-coordinate of the position.
   ///
-  /// @return The y-coordinate of the translation.
+  /// @return The y-coordinate of the position.
   [[nodiscard]] float y() const { return transform_[7]; }
 
-  /// @brief Returns the z-coordinate of the translation.
+  /// @brief Returns the z-coordinate of the position.
   ///
-  /// @return The z-coordinate of the translation.
+  /// @return The z-coordinate of the position.
   [[nodiscard]] float z() const { return transform_[11]; }
 
   /// @brief Friend function to perform matrix multiplication between a matrix

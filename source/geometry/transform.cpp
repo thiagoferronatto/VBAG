@@ -70,7 +70,7 @@ void Transform::rotate(V3F eulerAngles) {
 void Transform::rotate(float xr, float yr, float zr) { rotate({xr, yr, zr}); }
 
 void Transform::rotateInPlace(V3F eulerAngles) {
-  auto tmp{translation()};
+  auto tmp{position()};
   translate(-tmp);
   rotate(eulerAngles);
   translate(tmp);
@@ -109,7 +109,7 @@ V3F Transform::up() const {
   return col2.normalized();
 }
 
-V3F Transform::translation() const { return {x(), y(), z()}; }
+V3F Transform::position() const { return {x(), y(), z()}; }
 
 M4F Transform::operator*(const Transform &other) const {
   return transform_ * other.transform_;

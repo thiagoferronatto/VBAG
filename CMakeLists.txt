@@ -37,6 +37,6 @@ add_executable(VBAG WIN32
         include/util/error_handling.hpp
         source/input/input.cpp
         include/input/input.hpp
-        source/geometry/object.cpp)
+        source/geometry/object.cpp source/graphics/triangle_mesh.cpp include/graphics/triangle_mesh.hpp source/graphics/light.cpp include/graphics/light.hpp)
 
 target_link_libraries(VBAG d3d9.lib)
