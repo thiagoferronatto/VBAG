@@ -4,6 +4,8 @@ I know that "VBAG" doesn't match the actual title, but it did before and sounds 
 
 https://github.com/thiagoferronatto/VBAG/assets/31262053/da4c1b7e-8006-42aa-b0a1-7bea880634cb
 
+https://github.com/thiagoferronatto/VBAG/assets/31262053/45f27199-32ba-488f-b86b-9912dedf07cf
+
 ## 1. Overview
 
 VBAG is a boredom-induced holiday project turned game engine, capable of rendering wireframe scenes in 3D and projecting them into ~your console window~ **an actual graphical window** while simultaneously processing user keyboard inputs in real time.
