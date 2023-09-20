@@ -42,7 +42,8 @@ add_executable(VBAG WIN32
         include/graphics/triangle_mesh.hpp
         source/graphics/light.cpp
         include/graphics/light.hpp
-        include/graphics/quad_mesh.cpp
-        include/graphics/quad_mesh.hpp)
+        source/graphics/quad_mesh.cpp
+        include/graphics/quad_mesh.hpp
+        include/util/string.hpp)
 
 target_link_libraries(VBAG d3d9.lib)
