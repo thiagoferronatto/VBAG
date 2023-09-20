@@ -2,7 +2,6 @@
   <code_scheme name="Project" version="173">
     <option name="LINE_SEPARATOR" value="&#10;" />
     <option name="RIGHT_MARGIN" value="80" />
-    <option name="ENABLE_SECOND_REFORMAT" value="true" />
     <option name="SOFT_MARGINS" value="80" />
     <Objective-C>
       <option name="INDENT_NAMESPACE_MEMBERS" value="0" />

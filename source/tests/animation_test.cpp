@@ -141,7 +141,11 @@ void testAnimations(HINSTANCE instance) {
   mesh.addQuad(5, 6, 1, 0);
   mesh.addQuad(3, 2, 7, 4);
 
-  scene.addObject(&mesh);
+  auto trigMesh{mesh.asTriangleMesh()};
+
+  QuadMesh finalMesh{trigMesh};
+
+  scene.addObject(&finalMesh);
 
   PointLight light{"point_light"};
   scene.addObject(&light);
