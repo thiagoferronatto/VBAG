@@ -21,6 +21,7 @@ public:
   virtual void drawLine(V3F a, V3F b, D3DCOLOR color) = 0;
   virtual void drawTriangle(V3F v1, V3F v2, V3F v3, D3DCOLOR c1, D3DCOLOR c2,
                             D3DCOLOR c3) = 0;
+  virtual void drawPoint(V3F p) = 0;
   virtual void present() = 0;
   virtual HWND window() = 0;
 
@@ -146,6 +147,35 @@ public:
     device_->BeginScene();
     device_->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
     device_->EndScene();
+    vertexBuffer->Release();
+  }
+
+  void drawPoint(V3F p) override {
+    struct Vertex {
+      float x, y, z, rhw;
+      D3DCOLOR diffuse;
+    };
+    constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
+
+    const Vertex vertices[1]{{p.x, p.y, p.z, 1, D3DCOLOR_XRGB(255, 255, 255)}};
+
+    device_->SetFVF(VertexType);
+
+    IDirect3DVertexBuffer9 *vertexBuffer;
+    device_->CreateVertexBuffer(sizeof(Vertex), 0, VertexType, D3DPOOL_DEFAULT,
+                                &vertexBuffer, nullptr);
+    void *vertexBufferData;
+    vertexBuffer->Lock(0, sizeof(Vertex), &vertexBufferData, 0);
+    memcpy(vertexBufferData, vertices, sizeof(Vertex));
+    vertexBuffer->Unlock();
+    device_->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+    float pointScale{5};
+    device_->SetRenderState(D3DRS_POINTSIZE, *(DWORD *)&pointScale);
+    device_->BeginScene();
+    device_->DrawPrimitive(D3DPT_POINTLIST, 0, 1);
+    device_->EndScene();
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
     vertexBuffer->Release();
   }
 

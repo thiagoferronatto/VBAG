@@ -3,6 +3,7 @@
 #include "animation/animation_engine.hpp"
 #include "geometry/graph.hpp"
 #include "graphics/light.hpp"
+#include "graphics/quad_mesh.hpp"
 #include "graphics/triangle_mesh.hpp"
 #include "input/input.hpp"
 #include "output/d3d9_screen.hpp"
@@ -114,37 +115,31 @@ void testAnimations(HINSTANCE instance) {
       velocity += gravity * engine->deltaTime();
   };
 #else
-  TriangleMesh mesh{"bah"};
+  QuadMesh mesh{"bah"};
   mesh.addVertex(-1, -1, 1);
   mesh.addVertex(1, -1, 1);
   mesh.addVertex(1, 1, 1);
   mesh.addVertex(-1, 1, 1);
   mesh.addVertex(-1, 1, -1);
-  mesh.addVertex(1, 1, -1);
-  mesh.addVertex(1, -1, -1);
   mesh.addVertex(-1, -1, -1);
+  mesh.addVertex(1, -1, -1);
+  mesh.addVertex(1, 1, -1);
 
-  mesh.addNormal(mesh.vertices()[0]);
-  mesh.addNormal(mesh.vertices()[1]);
-  mesh.addNormal(mesh.vertices()[2]);
-  mesh.addNormal(mesh.vertices()[3]);
-  mesh.addNormal(mesh.vertices()[4]);
-  mesh.addNormal(mesh.vertices()[5]);
-  mesh.addNormal(mesh.vertices()[6]);
-  mesh.addNormal(mesh.vertices()[7]);
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
+  mesh.addNormal({1, 2, 3});
 
-  mesh.addTriangle(0, 1, 2);
-  mesh.addTriangle(0, 2, 3);
-  mesh.addTriangle(1, 6, 5);
-  mesh.addTriangle(1, 5, 2);
-  mesh.addTriangle(6, 7, 4);
-  mesh.addTriangle(6, 4, 5);
-  mesh.addTriangle(7, 0, 3);
-  mesh.addTriangle(7, 3, 4);
-  mesh.addTriangle(7, 6, 1);
-  mesh.addTriangle(7, 1, 0);
-  mesh.addTriangle(3, 2, 5);
-  mesh.addTriangle(3, 5, 4);
+  mesh.addQuad(0, 1, 2, 3);
+  mesh.addQuad(1, 6, 7, 2);
+  mesh.addQuad(6, 5, 4, 7);
+  mesh.addQuad(5, 0, 3, 4);
+  mesh.addQuad(5, 6, 1, 0);
+  mesh.addQuad(3, 2, 7, 4);
 
   scene.addObject(&mesh);
 
@@ -152,7 +147,7 @@ void testAnimations(HINSTANCE instance) {
   scene.addObject(&light);
 
   // TODO: figure out why the aspect ratio is squishing stuff
-  Camera camera{"cam", 60, 600.0f / 800};
+  Camera camera{"cam", 60, 720.0f / 1280};
   scene.addObject(&camera);
   scene.setMainCamera("cam");
 
@@ -195,7 +190,7 @@ void testAnimations(HINSTANCE instance) {
   };
 #endif
 
-  D3D9Screen screen{instance, "VBAG Demo", 800, 600};
+  D3D9Screen screen{instance, "VBAG Demo", 1280, 720};
   AnimationEngine engine{screen, setupFunc, loopFunc, scene};
   engine.run();
 }

@@ -109,17 +109,24 @@ void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
   }
 }
 
+void AnimationEngine::drawQuadMesh(const QuadMesh *mesh) {
+  auto triangleMesh{mesh->asTriangleMesh()};
+  drawMesh(&triangleMesh);
+}
+
 void AnimationEngine::draw(float thickness, char fill) {
   for (auto &[_, object] : scene_) {
     // cameras and lights are not drawn, so checking them here is dumb
-    auto graphPointer{dynamic_cast<GV3F *>(object)};
-    if (graphPointer) {
+    if (auto graphPointer{dynamic_cast<GV3F *>(object)}) {
       drawGraph(graphPointer, thickness, fill);
       continue;
     }
-    auto meshPointer{dynamic_cast<TriangleMesh *>(object)};
-    if (meshPointer) {
-      drawMesh(meshPointer);
+    if (auto triangleMeshPointer{dynamic_cast<TriangleMesh *>(object)}) {
+      drawMesh(triangleMeshPointer);
+      continue;
+    }
+    if (auto quadMeshPointer{dynamic_cast<QuadMesh *>(object)}) {
+      drawQuadMesh(quadMeshPointer);
       continue;
     }
   }

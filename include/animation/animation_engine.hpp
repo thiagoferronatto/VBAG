@@ -9,6 +9,7 @@
 #include "geometry/graph.hpp"
 #include "geometry/scene.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/quad_mesh.hpp"
 #include "graphics/triangle_mesh.hpp"
 #include "output/d3d9_screen.hpp"
 
@@ -52,6 +53,8 @@ public:
   void drawGraph(const GV3F *g, float thickness = 3, char fill = '#');
 
   void drawMesh(const TriangleMesh *mesh);
+
+  void drawQuadMesh(const QuadMesh *mesh);
 
   /// @brief Draws the current scene on the screen.
   ///
