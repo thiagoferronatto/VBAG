@@ -27,22 +27,21 @@ void AnimationEngine::drawGraph(const GV3F *g, float, char) {
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
   const auto mvp{mainCamera->perspective() * mainCamera->worldToCamera() *
                  g->transform()};
-  V3F a, b;
   for (size_t i{}; i < g->order(); ++i) {
-    a = mvp * g->vertices()[i];
+    auto a = mvp * g->vertices()[i];
     for (auto elem : g->edges(i)) {
-      b = mvp * g->vertices()[elem];
-      a.x *= float(screen_.width());
-      a.y *= float(screen_.height());
+      auto aa{a}, b = mvp * g->vertices()[elem];
+      aa.x *= float(screen_.width());
+      aa.y *= float(screen_.height());
       b.x *= float(screen_.width());
       b.y *= float(screen_.height());
-      // I hate myself
-      auto tmpA{a}, tmpB{b};
-      tmpA.x += float(screen_.width()) / 2;
-      tmpA.y = float(screen_.height()) / 2 - tmpA.y;
-      tmpB.x += float(screen_.width()) / 2;
-      tmpB.y = float(screen_.height()) / 2 - tmpB.y;
-      screen_.drawLine(tmpA, tmpB, D3DCOLOR_XRGB(255, 255, 255));
+
+      aa.x += float(screen_.width()) / 2;
+      aa.y = float(screen_.height()) / 2 - aa.y;
+      b.x += float(screen_.width()) / 2;
+      b.y = float(screen_.height()) / 2 - b.y;
+
+      screen_.drawLine(aa, b, D3DCOLOR_XRGB(255, 255, 255));
     }
   }
 }

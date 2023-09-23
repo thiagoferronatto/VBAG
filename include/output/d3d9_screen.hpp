@@ -101,6 +101,7 @@ public:
       float x, y, z, rhw;
       D3DCOLOR diffuse;
     };
+
     constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
 
     const Vertex vertices[2]{{a.x, a.y, a.z, 1, color},

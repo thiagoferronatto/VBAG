@@ -8,17 +8,18 @@
 #include "input/input.hpp"
 #include "output/d3d9_screen.hpp"
 
-void testAnimations(HINSTANCE instance) {
+#define WIREFRAME_GAME
 
+void testAnimations(HINSTANCE instance) {
   Scene scene;
 
-#if false
+#ifdef WIREFRAME_GAME
   V3F velocity{};
 
   // a graph that will hold our shape
   GV3F g{GV3F::cube("cube")}, h{GV3F::cube("lil_cube")},
       i{GV3F::cube("static_cube")};
-  Camera camera{"main_camera", 0.25, float(800) / float(600)};
+  Camera camera{"main_camera", 90, float(720) / float(1280)};
 
   g.addChild(&h);
   g.addChild(&camera);
@@ -141,11 +142,7 @@ void testAnimations(HINSTANCE instance) {
   mesh.addQuad(5, 6, 1, 0);
   mesh.addQuad(3, 2, 7, 4);
 
-  auto trigMesh{mesh.asTriangleMesh()};
-
-  QuadMesh finalMesh{trigMesh};
-
-  scene.addObject(&finalMesh);
+  scene.addObject(&mesh);
 
   PointLight light{"point_light"};
   scene.addObject(&light);
