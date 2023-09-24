@@ -1,6 +1,8 @@
 #include "graphics/camera.hpp"
 #include <numbers>
 
+namespace vbag {
+
 Camera::Camera(const std::string &name, float fovDeg, float pixelAspectRatio_)
     : Object(name), fovDeg_{fovDeg}, aspectRatio_{pixelAspectRatio_} {
   updateWTC_();
@@ -33,3 +35,5 @@ void Camera::updateWTC_() {
     };
   // clang-format on
 }
+
+} // namespace vbag

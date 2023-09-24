@@ -5,7 +5,9 @@
 
 #include "graphics/light.hpp"
 #include "graphics/triangle_mesh.hpp"
-#include "util/floating_point_comparison.hpp"
+#include "util/math.hpp"
+
+namespace vbag {
 
 static auto operator*(const M4F &matrix, const V3F &vector) {
   Matrix<float, 4, 1> extended{vector.x, vector.y, vector.z, 1};
@@ -41,7 +43,7 @@ void AnimationEngine::drawGraph(const GV3F *g, float, char) {
       b.x += float(screen_.width()) / 2;
       b.y = float(screen_.height()) / 2 - b.y;
 
-      screen_.drawLine(aa, b, D3DCOLOR_XRGB(255, 255, 255));
+      screen_.drawLine(aa, b, g->color());
     }
   }
 }
@@ -171,3 +173,5 @@ Camera &AnimationEngine::camera() { return *scene_.mainCamera(); }
 void AnimationEngine::delay(float milliseconds) { Sleep(DWORD(milliseconds)); }
 
 float AnimationEngine::deltaTime() const { return deltaTime_; }
+
+} // namespace vbag

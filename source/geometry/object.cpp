@@ -1,5 +1,7 @@
 #include "geometry/object.hpp"
 
+namespace vbag {
+
 Object::Object(std::string name) : name_{std::move(name)} {}
 
 Object::~Object() = default;
@@ -32,3 +34,5 @@ void Object::removeChild(Object *child) {
   (void)std::remove(children_.begin(), children_.end(), child);
   child->parent_ = nullptr;
 }
+
+} // namespace vbag

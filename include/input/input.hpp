@@ -3,6 +3,8 @@
 
 #include <windows.h>
 
+namespace vbag {
+
 /// @enum KeyCode
 /// @brief Enumerates the different key codes for keyboard keys.
 ///
@@ -73,5 +75,7 @@ public:
   /// @return True if the specified key is currently pressed, false otherwise.
   static bool getKey(KeyCode);
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_INPUT_HPP

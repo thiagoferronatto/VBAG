@@ -3,6 +3,8 @@
 
 #include "graphics/triangle_mesh.hpp"
 
+namespace vbag {
+
 class QuadMesh : public Object {
 public:
   struct Quad {
@@ -59,5 +61,7 @@ private:
   std::vector<V3F> vertices_, normals_;
   std::vector<Quad> quads_;
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPHICS_QUAD_MESH_HPP

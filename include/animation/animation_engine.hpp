@@ -13,6 +13,8 @@
 #include "graphics/triangle_mesh.hpp"
 #include "output/d3d9_screen.hpp"
 
+namespace vbag {
+
 /// @class AnimationEngine
 /// @brief The AnimationEngine class provides a framework for creating and
 /// animating scenes.
@@ -115,5 +117,7 @@ private:
   float deltaTime_{}; ///< The time elapsed between the current and previous
                       ///< animation frame.
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_ANIMATION_ANIMATION_ENGINE_HPP

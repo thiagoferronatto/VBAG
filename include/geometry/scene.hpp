@@ -1,9 +1,11 @@
 #ifndef VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_SCENE_HPP
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_SCENE_HPP
 
-#include <map>
+#include <unordered_map>
 
 #include "graphics/camera.hpp"
+
+namespace vbag {
 
 /// @class Scene
 /// @brief The Scene class represents a scene containing objects and a main
@@ -68,10 +70,12 @@ public:
   [[nodiscard]] auto end() const { return objects_.end(); }
 
 private:
-  std::map<std::string, Object *>
+  std::unordered_map<std::string, Object *>
       objects_; ///< A map containing pointers to objects in the scene, indexed
                 ///< by their names.
   Camera *mainCamera_{}; ///< Pointer to the main camera object in the scene.
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_SCENE_HPP

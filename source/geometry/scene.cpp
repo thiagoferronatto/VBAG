@@ -1,6 +1,8 @@
 #include "geometry/scene.hpp"
 #include "util/error_handling.hpp"
 
+namespace vbag {
+
 void Scene::addObject(Object *object) {
   if (!object)
     throw RuntimeError<NullPointerToObject>{};
@@ -30,3 +32,5 @@ Object *Scene::object(const std::string &name) { return objects_.at(name); }
 const Camera *Scene::mainCamera() const { return mainCamera_; }
 
 Camera *Scene::mainCamera() { return mainCamera_; }
+
+} // namespace vbag

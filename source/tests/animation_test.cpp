@@ -11,107 +11,110 @@
 #define WIREFRAME_GAME
 
 void testAnimations(HINSTANCE instance) {
-  Scene scene;
+  vbag::Scene scene;
 
 #ifdef WIREFRAME_GAME
-  V3F velocity{};
+  vbag::V3F velocity{};
 
-  // a graph that will hold our shape
-  GV3F g{GV3F::cube("cube")}, h{GV3F::cube("lil_cube")},
-      i{GV3F::cube("static_cube")};
-  Camera camera{"main_camera", 90, float(720) / float(1280)};
+  vbag::GV3F g{vbag::GV3F::cube("cube")}, h{vbag::GV3F::cube("lil_cube")};
+
+  std::vector<vbag::GV3F> tiles;
+  for (auto i{0}; i < 10; ++i) {
+    for (auto j{0}; j < 10; ++j) {
+      auto tile{vbag::GV3F::cube(
+          "static_cube_" + std::to_string(i) + std::to_string(j),
+          vbag::RgbColor{float(i) / 10.0f, 1 - std::abs(float(i - j)) / 10.0f,
+                      float(j) / 10.0f})};
+      tile.transform().scale(2, 0, 2);
+      tile.transform().translate(4.0f * float(i - 5), 0, -4.0f * float(j));
+      tiles.emplace_back(std::move(tile));
+    }
+  }
+
+  vbag::Camera camera{"main_camera", 106, float(720) / float(1280)};
 
   g.addChild(&h);
   g.addChild(&camera);
   scene.addObject(&g); // automatically adds all of g's children
-  scene.addObject(&i);
+  for (auto &staticCube : tiles)
+    scene.addObject(&staticCube);
+
   scene.setMainCamera("main_camera");
 
   auto &cube{*scene.object("cube")};
   auto &lilCube{*scene.object("lil_cube")};
-  auto &staticCube{*scene.object("static_cube")};
   auto &mainCam{*scene.mainCamera()};
-  auto setupFunc = [&](AnimationEngine *engine) {
-    staticCube.transform().scale(2, 2, 2);
-    staticCube.transform().translate(0, 1, 0);
+  auto setupFunc = [&](vbag::AnimationEngine *engine) {
     lilCube.transform().scale(.5, .5, .5);
     lilCube.transform().translate(0, 1.5, 0);
     mainCam.transform().translate(2, 3, 10);
   };
 
-  auto loopFunc = [&](AnimationEngine *engine) {
-    // current accelerations
-    V3F acceleration{};
-    V3F rotation{};
+  auto loopFunc = [&](vbag::AnimationEngine *engine) {
+    vbag::V3F acceleration{};
+    vbag::V3F rotation{};
 
     static constexpr auto factor{0.5f};
-    static constexpr V3F gravity{0, -0.75, 0};
+    static constexpr vbag::V3F gravity{0, -0.75, 0};
 
-    // moving the cube
-    if (Input::getKey(KeyCode::W) &&
-        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
+    if (vbag::Input::getKey(vbag::KeyCode::W) &&
+        (cube.transform().y() <= 0 || vbag::isZero(cube.transform().y())))
       acceleration -= cube.transform().forward();
-    if (Input::getKey(KeyCode::A) &&
-        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
+    if (vbag::Input::getKey(vbag::KeyCode::A) &&
+        (cube.transform().y() <= 0 || vbag::isZero(cube.transform().y())))
       acceleration -= cube.transform().right();
-    if (Input::getKey(KeyCode::S) &&
-        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
+    if (vbag::Input::getKey(vbag::KeyCode::S) &&
+        (cube.transform().y() <= 0 || vbag::isZero(cube.transform().y())))
       acceleration += cube.transform().forward();
-    if (Input::getKey(KeyCode::D) &&
-        (cube.transform().y() <= 0 || isZero(cube.transform().y())))
+    if (vbag::Input::getKey(vbag::KeyCode::D) &&
+        (cube.transform().y() <= 0 || vbag::isZero(cube.transform().y())))
       acceleration += cube.transform().right();
-    if (Input::getKey(KeyCode::Q))
-      rotation += V3F::up();
-    if (Input::getKey(KeyCode::E))
-      rotation -= V3F::up();
+    if (vbag::Input::getKey(vbag::KeyCode::Q))
+      rotation += vbag::V3F::up();
+    if (vbag::Input::getKey(vbag::KeyCode::E))
+      rotation -= vbag::V3F::up();
 
     acceleration = acceleration.normalized() * factor * engine->deltaTime();
     rotation *= engine->deltaTime();
 
-    // handling jump after accel normalization
-    if (Input::getKey(KeyCode::Space) &&
-        (cube.transform().y() < 0 || isZero(cube.transform().y())))
-      acceleration += V3F::up() * 20 * engine->deltaTime();
+    if (vbag::Input::getKey(vbag::KeyCode::Space) &&
+        (cube.transform().y() < 0 || vbag::isZero(cube.transform().y())))
+      acceleration += vbag::V3F::up() * 20 * engine->deltaTime();
 
-    // moving the camera
-    if (Input::getKey(KeyCode::I))
-      mainCam.transform().translate(V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::J))
-      mainCam.transform().translate(-V3F::right() * engine->deltaTime());
-    if (Input::getKey(KeyCode::K))
-      mainCam.transform().translate(-V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::L))
-      mainCam.transform().translate(V3F::right() * engine->deltaTime());
-    if (Input::getKey(KeyCode::U))
-      mainCam.transform().rotateInPlace(V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::O))
-      mainCam.transform().rotateInPlace(-V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::N))
+    if (vbag::Input::getKey(vbag::KeyCode::I))
+      mainCam.transform().translate(vbag::V3F::up() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::J))
+      mainCam.transform().translate(-vbag::V3F::right() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::K))
+      mainCam.transform().translate(-vbag::V3F::up() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::L))
+      mainCam.transform().translate(vbag::V3F::right() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::U))
+      mainCam.transform().rotateInPlace(vbag::V3F::up() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::O))
+      mainCam.transform().rotateInPlace(-vbag::V3F::up() * engine->deltaTime());
+    if (vbag::Input::getKey(vbag::KeyCode::N))
       mainCam.transform().rotateInPlace(-mainCam.transform().right() *
                                         engine->deltaTime());
-    if (Input::getKey(KeyCode::M))
+    if (vbag::Input::getKey(vbag::KeyCode::M))
       mainCam.transform().rotateInPlace(mainCam.transform().right() *
                                         engine->deltaTime());
 
-    if (Input::getKey(KeyCode::Escape))
+    if (vbag::Input::getKey(vbag::KeyCode::Escape))
       exit(0);
 
-    // incrementing the velocity by the acceleration
     velocity += acceleration;
 
-    // applying movement and rotation
     cube.transform().translate(velocity);
     cube.transform().rotateInPlace(rotation);
 
-    // simulating deceleration by drag
-    if (cube.transform().y() < 0 || isZero(cube.transform().y())) {
+    if (cube.transform().y() < 0 || vbag::isZero(cube.transform().y())) {
       velocity.x *= std::pow(0.1f, engine->deltaTime());
       velocity.z *= std::pow(0.1f, engine->deltaTime());
     }
 
-    // applying gravity and detecting collision with the ground plane y = 0
-    if (cube.transform().y() < 0 || isZero(cube.transform().y()))
-      cube.transform().translate(-V3F::up() * cube.transform().y());
+    if (cube.transform().y() < 0 || vbag::isZero(cube.transform().y()))
+      cube.transform().translate(-vbag::V3F::up() * cube.transform().y());
     else
       velocity += gravity * engine->deltaTime();
   };
@@ -158,40 +161,40 @@ void testAnimations(HINSTANCE instance) {
   };
 
   auto loopFunc = [&](AnimationEngine *engine) {
-    if (Input::getKey(KeyCode::W))
+    if (vbag::Input::getKey(vbag::KeyCode::W))
       camera.transform().translate(-5 * camera.transform().forward() *
                                    engine->deltaTime());
-    if (Input::getKey(KeyCode::A))
+    if (vbag::Input::getKey(vbag::KeyCode::A))
       camera.transform().translate(-5 * camera.transform().right() *
                                    engine->deltaTime());
-    if (Input::getKey(KeyCode::S))
+    if (vbag::Input::getKey(vbag::KeyCode::S))
       camera.transform().translate(5 * camera.transform().forward() *
                                    engine->deltaTime());
-    if (Input::getKey(KeyCode::D))
+    if (vbag::Input::getKey(vbag::KeyCode::D))
       camera.transform().translate(5 * camera.transform().right() *
                                    engine->deltaTime());
-    if (Input::getKey(KeyCode::Space))
+    if (vbag::Input::getKey(vbag::KeyCode::Space))
       camera.transform().translate(5 * V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::LShift))
+    if (vbag::Input::getKey(vbag::KeyCode::LShift))
       camera.transform().translate(-5 * V3F::up() * engine->deltaTime());
 
-    if (Input::getKey(KeyCode::Q))
+    if (vbag::Input::getKey(vbag::KeyCode::Q))
       camera.transform().rotateInPlace(V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::E))
+    if (vbag::Input::getKey(vbag::KeyCode::E))
       camera.transform().rotateInPlace(-V3F::up() * engine->deltaTime());
-    if (Input::getKey(KeyCode::R))
+    if (vbag::Input::getKey(vbag::KeyCode::R))
       camera.transform().rotateInPlace(camera.transform().right() *
                                        engine->deltaTime());
-    if (Input::getKey(KeyCode::F))
+    if (vbag::Input::getKey(vbag::KeyCode::F))
       camera.transform().rotateInPlace(-camera.transform().right() *
                                        engine->deltaTime());
 
-    if (Input::getKey(KeyCode::Escape))
+    if (vbag::Input::getKey(vbag::KeyCode::Escape))
       exit(0);
   };
 #endif
 
-  D3D9Screen screen{instance, "VBAG Demo", 1280, 720};
-  AnimationEngine engine{screen, setupFunc, loopFunc, scene};
+  vbag::D3D9Screen screen{instance, "VBAG Demo", 1280, 720};
+  vbag::AnimationEngine engine{screen, setupFunc, loopFunc, scene};
   engine.run();
 }

@@ -3,6 +3,8 @@
 
 #include <string>
 
+namespace vbag {
+
 template <typename T>
 concept Character = std::same_as<T, char> || std::same_as<T, unsigned char> ||
                     std::same_as<T, signed char> || std::same_as<T, char8_t> ||
@@ -145,5 +147,7 @@ private:
 };
 
 using String = BasicString<char>;
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_UTIL_STRING_HPP

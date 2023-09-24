@@ -3,6 +3,8 @@
 
 #include <exception>
 
+namespace vbag {
+
 /// @enum ErrorType
 /// @brief Enumeration representing different types of runtime errors.
 ///
@@ -55,5 +57,7 @@ public:
     return errorMessages[errorType];
   }
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_UTIL_ERROR_HANDLING_HPP

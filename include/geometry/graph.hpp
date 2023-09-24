@@ -1,12 +1,15 @@
 #ifndef VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPH_HPP
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPH_HPP
 
-#include "geometry/object.hpp"
-
 #include <cassert>
 #include <cstdio>
 #include <list>
 #include <vector>
+
+#include "geometry/object.hpp"
+#include "graphics/color.hpp"
+
+namespace vbag {
 
 /// @tparam T The type contained by each vertex.
 /// @class Graph
@@ -20,7 +23,8 @@ public:
   /// @brief Constructs a Graph object with the given name.
   ///
   /// @param name The name of the graph.
-  explicit Graph(const std::string &name) : Object(name){};
+  explicit Graph(const std::string &name, const RgbColor &color = RgbColor::white())
+      : Object(name), color_{color} {};
 
   /// @brief Adds a vertex to the graph.
   ///
@@ -92,9 +96,10 @@ public:
   ///
   /// @param name The name of the cube graph.
   /// @return A Graph<V3F> representing a cube.
-  static Graph<V3F> cube(const std::string &name) {
+  static Graph<V3F> cube(const std::string &name,
+                         const RgbColor &color = RgbColor::white()) {
     static constexpr size_t a{0}, b{1}, c{2}, d{3}, e{4}, f{5}, g{6}, h{7};
-    Graph<V3F> graph{name};
+    Graph<V3F> graph{name, color};
     graph.addVertex(-1, 1, 1);
     graph.addVertex(-1, -1, 1);
     graph.addVertex(1, -1, 1);
@@ -118,12 +123,17 @@ public:
     return graph;
   }
 
+  [[nodiscard]] RgbColor color() const { return color_; }
+
 private:
   std::vector<T> vertices_; ///< The vertices of the graph.
   std::vector<std::list<size_t>>
       adjacencyLists_; ///< The adjacency lists for each vertex.
+  RgbColor color_;
 };
 
 using GV3F = Graph<V3F>;
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPH_HPP

@@ -6,6 +6,8 @@
 #include <numeric>
 #include <type_traits>
 
+namespace vbag {
+
 /// @tparam T The data type of the matrix elements.
 /// @tparam h The number of rows in the matrix.
 /// @tparam w The number of columns in the matrix.
@@ -179,5 +181,7 @@ template <typename T> using M4 = Matrix<T, 4, 4>;
 
 /// @brief Type alias for a 4x4 matrix with elements of type float.
 using M4F = M4<float>;
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_MATH_MATRIX_HPP

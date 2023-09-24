@@ -3,6 +3,8 @@
 
 #include "geometry/object.hpp"
 
+namespace vbag {
+
 class PointLight : public Object {
 public:
   explicit PointLight(std::string name) : Object(std::move(name)) {}
@@ -12,5 +14,7 @@ public:
 private:
   float intensity_{1};
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPHICS_LIGHT_HPP

@@ -3,6 +3,8 @@
 #include "geometry/object.hpp"
 #include "graphics/camera.hpp"
 
+namespace vbag {
+
 Transform::Transform(Object *object) : object_{object} {}
 
 Transform::Transform(const M4F &matrix, Object *object)
@@ -40,6 +42,8 @@ void Transform::scale(V3F scales) {
 }
 
 void Transform::scale(float xs, float ys, float zs) { scale({xs, ys, zs}); }
+
+void Transform::scale(float factor) { scale(factor, factor, factor); }
 
 void Transform::rotate(V3F eulerAngles) {
   // TODO: always rotate in place, but change axes
@@ -114,3 +118,5 @@ V3F Transform::position() const { return {x(), y(), z()}; }
 M4F Transform::operator*(const Transform &other) const {
   return transform_ * other.transform_;
 }
+
+} // namespace vbag

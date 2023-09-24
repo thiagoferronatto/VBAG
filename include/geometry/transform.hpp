@@ -3,7 +3,9 @@
 
 #include "math/matrix.hpp"
 #include "math/vector.hpp"
-#include "util/floating_point_comparison.hpp"
+#include "util/math.hpp"
+
+namespace vbag {
 
 class Object;
 
@@ -73,6 +75,8 @@ public:
   /// @param ys The scaling factor for the y-axis.
   /// @param zs The scaling factor for the z-axis.
   void scale(float, float, float);
+
+  void scale(float);
 
   /// @brief Rotates the object by the given Euler angles (yaw, pitch, roll).
   ///
@@ -170,5 +174,7 @@ private:
                  0, 0, 0, 1}; ///< The 4x4 transformation matrix.
   Object *object_;            ///< Pointer to the associated Object.
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_TRANSFORM_HPP

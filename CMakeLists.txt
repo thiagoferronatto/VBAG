@@ -25,7 +25,7 @@ add_executable(VBAG WIN32
         source/animation/animation_engine.cpp
         source/tests/animation_test.cpp
         source/main.cpp
-        include/util/floating_point_comparison.hpp
+        include/util/math.hpp
         include/math/matrix.hpp
         include/geometry/object.hpp
         source/graphics/camera.cpp
@@ -44,6 +44,7 @@ add_executable(VBAG WIN32
         include/graphics/light.hpp
         source/graphics/quad_mesh.cpp
         include/graphics/quad_mesh.hpp
-        include/util/string.hpp)
+        include/util/string.hpp
+        include/graphics/color.hpp)
 
 target_link_libraries(VBAG d3d9.lib)

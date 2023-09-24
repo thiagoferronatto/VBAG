@@ -8,6 +8,8 @@
 #include "geometry/transform.hpp"
 #include "util/error_handling.hpp"
 
+namespace vbag {
+
 /// @class Object
 /// @brief The Object class represents a generic object with a name, transform,
 /// and hierarchical relationships.
@@ -70,5 +72,7 @@ protected:
   std::vector<Object *> children_; ///< Vector of pointers to child objects.
   std::string name_;               ///< The name of the object.
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GEOMETRY_OBJECT_HPP

@@ -4,11 +4,14 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-
-#include "math/vector.hpp"
 #include <d3d9.h>
 #include <string>
 #include <windows.h>
+
+#include "graphics/color.hpp"
+#include "math/vector.hpp"
+
+namespace vbag {
 
 class D3D9Screen;
 class AnimationEngine;
@@ -217,5 +220,7 @@ private:
   LPDIRECT3DDEVICE9 device_{};
   size_t width_, height_;
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_SCREEN_HPP

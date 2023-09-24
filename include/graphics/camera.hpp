@@ -5,6 +5,8 @@
 #include "math/matrix.hpp"
 #include "math/vector.hpp"
 
+namespace vbag {
+
 /// @class Camera
 /// @brief The Camera class represents a camera in a 3D scene.
 ///
@@ -18,7 +20,8 @@ public:
   ///
   /// @param name The name of the camera.
   /// @param fovDeg The field of view angle in degrees.
-  /// @param pixelAspectRatio_ The aspect ratio of the camera's view (width/height).
+  /// @param pixelAspectRatio_ The aspect ratio of the camera's view
+  /// (width/height).
   Camera(const std::string &name, float fovDeg, float pixelAspectRatio_);
 
   /// @brief Returns the perspective projection matrix of the camera.
@@ -48,5 +51,7 @@ private:
   float aspectRatio_; ///< The aspect ratio of the camera's view (width/height).
   M4F wtc_;           ///< The world-to-camera transformation matrix.
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPHICS_CAMERA_HPP

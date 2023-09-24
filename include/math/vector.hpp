@@ -2,9 +2,11 @@
 #define VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_VECTOR_HPP
 
 #include "math/matrix.hpp"
-#include "util/floating_point_comparison.hpp"
+#include "util/math.hpp"
 #include <cmath>
 #include <cstdint>
+
+namespace vbag {
 
 /// @tparam T The data type of the vector elements.
 /// @tparam dimension The dimension of the vector.
@@ -169,7 +171,7 @@ template <> struct Vector<float, 3> {
   ///
   /// @return True if the vector is a zero vector, false otherwise.
   [[nodiscard]] bool isZero() const {
-    return ::isZero(x) && ::isZero(y) && ::isZero(z);
+    return vbag::isZero(x) && vbag::isZero(y) && vbag::isZero(z);
   }
 
   /// @brief Returns a constant vector representing the right direction
@@ -194,5 +196,7 @@ template <> struct Vector<float, 3> {
 
 /// @brief Type alias for a 3D vector with elements of type float.
 using V3F = Vector<float, 3>;
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_VECTOR_HPP

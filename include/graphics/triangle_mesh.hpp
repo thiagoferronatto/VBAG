@@ -5,6 +5,8 @@
 #include "math/vector.hpp"
 #include <vector>
 
+namespace vbag {
+
 class TriangleMesh : public Object {
 public:
   struct Triangle {
@@ -36,5 +38,7 @@ private:
   std::vector<V3F> vertices_, normals_;
   std::vector<Triangle> triangles_;
 };
+
+} // namespace vbag
 
 #endif // VERY_BASIC_ASCII_GRAPHICS_API_INCLUDE_GRAPHICS_TRIANGLE_MESH_HPP
