@@ -15,7 +15,7 @@ Camera::Camera(const std::string &name, float fovDeg, float pixelAspectRatio_)
   // perspective projection matrix stolen
   // and adapted from https://ogldev.org/www/tutorial12/tutorial12.html
   // HACK: notice the -1e9 there. I have some idea why this prevents things that
-  // are behind the camera being drawn. keep it as high as possible.
+  // are behind the camera from being drawn. keep it as high as possible.
   static M4F perspectiveMatrix{xFactor, 0,       0,  0,    //
                                0,       yFactor, 0,  0,    //
                                0,       0,       1,  -1e9, //
