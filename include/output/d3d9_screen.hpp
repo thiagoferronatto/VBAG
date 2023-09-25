@@ -144,10 +144,6 @@ public:
     if (n == 0)
       return;
 
-    constexpr float clipPlane[]{1, 0, 0, 0};
-    device_->SetClipPlane(0, clipPlane);
-    device_->SetRenderState(D3DRS_CLIPPLANEENABLE, D3DCLIPPLANE0);
-
     constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
 
     std::vector<Vertex> vertices;
@@ -174,8 +170,6 @@ public:
     device_->BeginScene();
     device_->DrawPrimitive(D3DPT_LINELIST, 0, n);
     device_->EndScene();
-
-    device_->SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
 
     device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
     vertexBuffer->Release();
