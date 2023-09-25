@@ -15,9 +15,9 @@ public:
   }
 
   constexpr void clamp() {
-    r = r <= 1 ? r : 1;
-    g = g <= 1 ? g : 1;
-    b = b <= 1 ? b : 1;
+    r = std::max(0.0f, std::min(r, 1.0f));
+    g = std::max(0.0f, std::min(g, 1.0f));
+    b = std::max(0.0f, std::min(b, 1.0f));
   }
 
   [[nodiscard]] constexpr RgbColor clamped() const {

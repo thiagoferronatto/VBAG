@@ -16,36 +16,39 @@ void testAnimations(HINSTANCE instance) {
 #ifdef WIREFRAME_GAME
   vbag::V3F velocity{};
 
-  vbag::GV3F g{vbag::GV3F::cube("cube")}, h{vbag::GV3F::cube("lil_cube")};
+  vbag::GV3F cube{vbag::GV3F::cube("cube")},
+      lilCube{vbag::GV3F::cube("lil_cube")};
 
+  static constexpr int64_t tileAmount{40};
+  static constexpr float coveredArea{100},
+      tileSize{coveredArea / float(tileAmount)};
   std::vector<vbag::GV3F> tiles;
-  for (auto i{0}; i < 10; ++i) {
-    for (auto j{0}; j < 10; ++j) {
-      auto tile{vbag::GV3F::cube(
-          "static_cube_" + std::to_string(i) + std::to_string(j),
-          vbag::RgbColor{float(i) / 10.0f, 1 - std::abs(float(i - j)) / 10.0f,
-                      float(j) / 10.0f})};
-      tile.transform().scale(2, 0, 2);
-      tile.transform().translate(4.0f * float(i - 5), 0, -4.0f * float(j));
+  for (auto i{0ll}; i < tileAmount; ++i) {
+    for (auto j{0ll}; j < tileAmount; ++j) {
+      auto tile{vbag::GV3F::square(
+          "tile" + std::to_string(i * tileAmount + j),
+          vbag::RgbColor{float(i) / float(tileAmount),
+                         1 - std::abs(float(i - j)) / float(tileAmount),
+                         float(j) / float(tileAmount)})};
+      tile.transform().scale(tileSize);
+      tile.transform().translate(2 * tileSize * float(i - tileAmount / 2), 0,
+                                 -2 * tileSize * float(j - tileAmount / 2));
       tiles.emplace_back(std::move(tile));
     }
   }
 
-  vbag::Camera camera{"main_camera", 106, float(720) / float(1280)};
+  vbag::Camera mainCam{"main_camera", 106, float(720) / float(1280)};
 
-  g.addChild(&h);
-  g.addChild(&camera);
-  scene.addObject(&g); // automatically adds all of g's children
+  cube.addChild(&lilCube);
+  cube.addChild(&mainCam);
+  scene.addObject(&cube); // automatically adds all of cube's children
   for (auto &staticCube : tiles)
     scene.addObject(&staticCube);
 
   scene.setMainCamera("main_camera");
 
-  auto &cube{*scene.object("cube")};
-  auto &lilCube{*scene.object("lil_cube")};
-  auto &mainCam{*scene.mainCamera()};
   auto setupFunc = [&](vbag::AnimationEngine *engine) {
-    lilCube.transform().scale(.5, .5, .5);
+    lilCube.transform().scale(.5);
     lilCube.transform().translate(0, 1.5, 0);
     mainCam.transform().translate(2, 3, 10);
   };
@@ -54,7 +57,7 @@ void testAnimations(HINSTANCE instance) {
     vbag::V3F acceleration{};
     vbag::V3F rotation{};
 
-    static constexpr auto factor{0.5f};
+    static constexpr auto factor{2.0f};
     static constexpr vbag::V3F gravity{0, -0.75, 0};
 
     if (vbag::Input::getKey(vbag::KeyCode::W) &&
@@ -82,13 +85,16 @@ void testAnimations(HINSTANCE instance) {
       acceleration += vbag::V3F::up() * 20 * engine->deltaTime();
 
     if (vbag::Input::getKey(vbag::KeyCode::I))
-      mainCam.transform().translate(vbag::V3F::up() * engine->deltaTime());
+      mainCam.transform().translate(10 * vbag::V3F::up() * engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::J))
-      mainCam.transform().translate(-vbag::V3F::right() * engine->deltaTime());
+      mainCam.transform().translate(-10 * mainCam.transform().right() *
+                                    engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::K))
-      mainCam.transform().translate(-vbag::V3F::up() * engine->deltaTime());
+      mainCam.transform().translate(-10 * vbag::V3F::up() *
+                                    engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::L))
-      mainCam.transform().translate(vbag::V3F::right() * engine->deltaTime());
+      mainCam.transform().translate(10 * mainCam.transform().right() *
+                                    engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::U))
       mainCam.transform().rotateInPlace(vbag::V3F::up() * engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::O))
@@ -119,7 +125,7 @@ void testAnimations(HINSTANCE instance) {
       velocity += gravity * engine->deltaTime();
   };
 #else
-  QuadMesh mesh{"bah"};
+  vbag::QuadMesh mesh{"bah"};
   mesh.addVertex(-1, -1, 1);
   mesh.addVertex(1, -1, 1);
   mesh.addVertex(1, 1, 1);
@@ -129,14 +135,14 @@ void testAnimations(HINSTANCE instance) {
   mesh.addVertex(1, -1, -1);
   mesh.addVertex(1, 1, -1);
 
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
-  mesh.addNormal({1, 2, 3});
+  mesh.addNormal(-1, -1, 1);
+  mesh.addNormal(1, -1, 1);
+  mesh.addNormal(1, 1, 1);
+  mesh.addNormal(-1, 1, 1);
+  mesh.addNormal(-1, 1, -1);
+  mesh.addNormal(-1, -1, -1);
+  mesh.addNormal(1, -1, -1);
+  mesh.addNormal(1, 1, -1);
 
   mesh.addQuad(0, 1, 2, 3);
   mesh.addQuad(1, 6, 7, 2);
@@ -147,20 +153,19 @@ void testAnimations(HINSTANCE instance) {
 
   scene.addObject(&mesh);
 
-  PointLight light{"point_light"};
-  scene.addObject(&light);
+  // vbag::PointLight light{"point_light"};
+  // scene.addObject(&light);
 
   // TODO: figure out why the aspect ratio is squishing stuff
-  Camera camera{"cam", 60, 720.0f / 1280};
+  vbag::Camera camera{"cam", 60, 720.0f / 1280};
   scene.addObject(&camera);
   scene.setMainCamera("cam");
 
-  auto setupFunc = [&](AnimationEngine *engine) {
+  auto setupFunc = [&](vbag::AnimationEngine *engine) {
     camera.transform().translate(0, 0, 6);
-    light.transform().translate(-10, 10, 10);
   };
 
-  auto loopFunc = [&](AnimationEngine *engine) {
+  auto loopFunc = [&](vbag::AnimationEngine *engine) {
     if (vbag::Input::getKey(vbag::KeyCode::W))
       camera.transform().translate(-5 * camera.transform().forward() *
                                    engine->deltaTime());
@@ -174,14 +179,14 @@ void testAnimations(HINSTANCE instance) {
       camera.transform().translate(5 * camera.transform().right() *
                                    engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::Space))
-      camera.transform().translate(5 * V3F::up() * engine->deltaTime());
+      camera.transform().translate(5 * vbag::V3F::up() * engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::LShift))
-      camera.transform().translate(-5 * V3F::up() * engine->deltaTime());
+      camera.transform().translate(-5 * vbag::V3F::up() * engine->deltaTime());
 
     if (vbag::Input::getKey(vbag::KeyCode::Q))
-      camera.transform().rotateInPlace(V3F::up() * engine->deltaTime());
+      camera.transform().rotateInPlace(vbag::V3F::up() * engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::E))
-      camera.transform().rotateInPlace(-V3F::up() * engine->deltaTime());
+      camera.transform().rotateInPlace(-vbag::V3F::up() * engine->deltaTime());
     if (vbag::Input::getKey(vbag::KeyCode::R))
       camera.transform().rotateInPlace(camera.transform().right() *
                                        engine->deltaTime());

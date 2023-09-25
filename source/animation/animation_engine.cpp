@@ -23,7 +23,7 @@ AnimationEngine::AnimationEngine(Screen &screen, RenderFunc setup,
     : screen_{screen}, scene_{std::move(scene)}, setup_{std::move(setup)},
       loop_{std::move(loop)}, frameRate_{frameRate} {}
 
-void AnimationEngine::drawGraph(const GV3F *g, float, char) {
+void AnimationEngine::queueGraph(const GV3F *g, std::vector<Line> &dst) {
   auto mainCamera{scene_.mainCamera()};
   if (!mainCamera)
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
@@ -43,7 +43,8 @@ void AnimationEngine::drawGraph(const GV3F *g, float, char) {
       b.x += float(screen_.width()) / 2;
       b.y = float(screen_.height()) / 2 - b.y;
 
-      screen_.drawLine(aa, b, g->color());
+      if (aa.z <= 0 && b.z <= 0) // for clipping. this is ridiculous
+        dst.push_back({aa, b, g->color()});
     }
   }
 }
@@ -78,10 +79,7 @@ void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
     auto v1{mvp * mesh->vertices()[triangle.v1]},
         v2{mvp * mesh->vertices()[triangle.v2]},
         v3{mvp * mesh->vertices()[triangle.v3]};
-    // TODO: gotta do this bc the mvp maps the vertices to NDCs, but the
-    //       rasterizer right now doesn't take that into account, so for the
-    //       moment we're just scaling them back up. This is also somehow linked
-    //       to the camera's aspect ratio.
+    // TODO: actually learn shaders and let the GPU do this
     v1.x *= float(screen_.width());
     v1.y *= float(screen_.height());
     v2.x *= float(screen_.width());
@@ -95,8 +93,6 @@ void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
     auto c1{D3DCOLOR_XRGB(255, 0, 0)}, c2{D3DCOLOR_XRGB(0, 255, 0)},
         c3{D3DCOLOR_XRGB(0, 0, 255)};
 #endif
-    // TODO: this mapping to the center of the screen is also done due to the
-    //       lack of NDCs being used by the d3d rasterization.
     v1.x += float(screen_.width()) / 2;
     v1.y = float(screen_.height()) / 2 - v1.y;
     v2.x += float(screen_.width()) / 2;
@@ -106,7 +102,8 @@ void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
     // when the y coords are flipped, the normal is also flipped, so we just
     // change the order in which we pass them ahead and we're good (could also
     // use a D3DRS_CULLMODE to change the backface culling method to CCW)
-    screen_.drawTriangle(v3, v2, v1, c1, c2, c3);
+    if (v1.z <= 0 && v2.z <= 0 && v3.z <= 0) // for clipping. this is ridiculous
+      screen_.drawTriangle(v3, v2, v1, c3, c2, c1);
   }
 }
 
@@ -115,11 +112,12 @@ void AnimationEngine::drawQuadMesh(const QuadMesh *mesh) {
   drawMesh(&triangleMesh);
 }
 
-void AnimationEngine::draw(float thickness, char fill) {
+void AnimationEngine::draw() {
+  std::vector<Line> lines;
   for (auto &[_, object] : scene_) {
     // cameras and lights are not drawn, so checking them here is dumb
     if (auto graphPointer{dynamic_cast<GV3F *>(object)}) {
-      drawGraph(graphPointer, thickness, fill);
+      queueGraph(graphPointer, lines);
       continue;
     }
     if (auto triangleMeshPointer{dynamic_cast<TriangleMesh *>(object)}) {
@@ -131,6 +129,7 @@ void AnimationEngine::draw(float thickness, char fill) {
       continue;
     }
   }
+  screen_.drawLines(lines.data(), lines.size());
 }
 
 void AnimationEngine::run() {

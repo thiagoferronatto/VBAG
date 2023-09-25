@@ -23,7 +23,8 @@ public:
   /// @brief Constructs a Graph object with the given name.
   ///
   /// @param name The name of the graph.
-  explicit Graph(const std::string &name, const RgbColor &color = RgbColor::white())
+  explicit Graph(const std::string &name,
+                 const RgbColor &color = RgbColor::white())
       : Object(name), color_{color} {};
 
   /// @brief Adds a vertex to the graph.
@@ -120,6 +121,21 @@ public:
     graph.addEdge(e, h);
     graph.addEdge(f, g);
     graph.addEdge(g, h);
+    return graph;
+  }
+
+  static Graph<V3F> square(const std::string &name,
+                           const RgbColor &color = RgbColor::white()) {
+    static constexpr size_t a{0}, b{1}, c{2}, d{3};
+    Graph<V3F> graph{name, color};
+    graph.addVertex(-1, 0, -1);
+    graph.addVertex(-1, 0, 1);
+    graph.addVertex(1, 0, -1);
+    graph.addVertex(1, 0, 1);
+    graph.addEdge(a, b);
+    graph.addEdge(a, c);
+    graph.addEdge(b, d);
+    graph.addEdge(c, d);
     return graph;
   }
 

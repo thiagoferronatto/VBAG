@@ -52,18 +52,14 @@ public:
   /// @param g A pointer to the object representing the graph.
   /// @param thickness The thickness of the graph (default is 3).
   /// @param fill The character representing the graph (default is '#').
-  void drawGraph(const GV3F *g, float thickness = 3, char fill = '#');
+  void queueGraph(const GV3F *g, std::vector<Line> &dst);
 
   void drawMesh(const TriangleMesh *mesh);
 
   void drawQuadMesh(const QuadMesh *mesh);
 
   /// @brief Draws the current scene on the screen.
-  ///
-  /// @param thickness The default thickness for drawing elements (default is
-  /// 3).
-  /// @param fill The default character for drawing elements (default is '#').
-  void draw(float = 3, char = '#');
+  void draw();
 
   /// @brief Starts the animation loop and continues indefinitely until the
   /// program terminates.

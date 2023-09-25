@@ -16,12 +16,18 @@ namespace vbag {
 class D3D9Screen;
 class AnimationEngine;
 
+struct Line {
+  V3F start, end;
+  D3DCOLOR color;
+};
+
 class Screen {
 public:
   virtual void clear() = 0;
   [[nodiscard]] virtual size_t width() const = 0;
   [[nodiscard]] virtual size_t height() const = 0;
-  virtual void drawLine(V3F a, V3F b, D3DCOLOR color) = 0;
+  virtual void drawLine(const Line &line) = 0;
+  virtual void drawLines(const Line *lines, size_t n) = 0;
   virtual void drawTriangle(V3F v1, V3F v2, V3F v3, D3DCOLOR c1, D3DCOLOR c2,
                             D3DCOLOR c3) = 0;
   virtual void drawPoint(V3F p) = 0;
@@ -81,7 +87,7 @@ public:
 
     // creating a device
     d3d_->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, window_,
-                       D3DCREATE_SOFTWARE_VERTEXPROCESSING,
+                       D3DCREATE_HARDWARE_VERTEXPROCESSING,
                        &presentationParameters, &device_);
     if (!device_)
       throw Error{"could not create D3D device"};
@@ -99,7 +105,7 @@ public:
     d3d_->Release();
   }
 
-  void drawLine(V3F a, V3F b, D3DCOLOR color) override {
+  void drawLine(const Line &line) override {
     struct Vertex {
       float x, y, z, rhw;
       D3DCOLOR diffuse;
@@ -107,8 +113,9 @@ public:
 
     constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
 
-    const Vertex vertices[2]{{a.x, a.y, a.z, 1, color},
-                             {b.x, b.y, b.z, 1, color}};
+    const Vertex vertices[2]{
+        {line.start.x, line.start.y, line.start.z, 1, line.color},
+        {line.end.x, line.end.y, line.end.z, 1, line.color}};
 
     device_->SetFVF(VertexType);
 
@@ -128,12 +135,59 @@ public:
     vertexBuffer->Release();
   }
 
+  void drawLines(const Line *lines, size_t n) override {
+    struct Vertex {
+      float x, y, z, rhw;
+      D3DCOLOR diffuse;
+    };
+
+    if (n == 0)
+      return;
+
+    constexpr float clipPlane[]{1, 0, 0, 0};
+    device_->SetClipPlane(0, clipPlane);
+    device_->SetRenderState(D3DRS_CLIPPLANEENABLE, D3DCLIPPLANE0);
+
+    constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
+
+    std::vector<Vertex> vertices;
+    for (size_t i{}; i < n; ++i) {
+      auto color{lines[i].color};
+      vertices.push_back(
+          {lines[i].start.x, lines[i].start.y, lines[i].start.z, 1, color});
+      vertices.push_back(
+          {lines[i].end.x, lines[i].end.y, lines[i].end.z, 1, color});
+    }
+
+    device_->SetFVF(VertexType);
+
+    IDirect3DVertexBuffer9 *vertexBuffer;
+    device_->CreateVertexBuffer(2 * n * sizeof(Vertex), 0, VertexType,
+                                D3DPOOL_DEFAULT, &vertexBuffer, nullptr);
+    void *vertexBufferData;
+    vertexBuffer->Lock(0, 2 * n * sizeof(Vertex), &vertexBufferData, 0);
+    memcpy(vertexBufferData, vertices.data(), 2 * n * sizeof(Vertex));
+    vertexBuffer->Unlock();
+    device_->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+
+    device_->BeginScene();
+    device_->DrawPrimitive(D3DPT_LINELIST, 0, n);
+    device_->EndScene();
+
+    device_->SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
+
+    device_->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+    vertexBuffer->Release();
+  }
+
   void drawTriangle(V3F v1, V3F v2, V3F v3, D3DCOLOR c1, D3DCOLOR c2,
                     D3DCOLOR c3) override {
     struct Vertex {
       float x, y, z, rhw;
       D3DCOLOR diffuse;
     };
+
     constexpr auto VertexType{D3DFVF_XYZRHW | D3DFVF_DIFFUSE};
     const Vertex vertices[3]{{v1.x, v1.y, v1.z, 1, c1},
                              {v2.x, v2.y, v2.z, 1, c2},
@@ -148,6 +202,7 @@ public:
     vertexBuffer->Unlock();
     device_->SetStreamSource(0, vertexBuffer, 0, sizeof(Vertex));
     device_->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+
     device_->BeginScene();
     device_->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
     device_->EndScene();
