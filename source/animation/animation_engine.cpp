@@ -18,12 +18,12 @@ static auto operator*(const M4F &matrix, const V3F &vector) {
   return V3F{result.data[0], result.data[1], result.data[2]} / den;
 }
 
-AnimationEngine::AnimationEngine(Screen &screen, RenderFunc setup,
-                                 RenderFunc loop, Scene scene, float frameRate)
+Engine::Engine(Screen &screen, RenderFunc setup, RenderFunc loop, Scene scene,
+               float frameRate)
     : screen_{screen}, scene_{std::move(scene)}, setup_{std::move(setup)},
       loop_{std::move(loop)}, frameRate_{frameRate} {}
 
-void AnimationEngine::queueGraph(const GV3F *g, std::vector<Line> &dst) {
+void Engine::queueGraph(const GV3F *g, std::vector<Line> &dst) {
   auto mainCamera{scene_.mainCamera()};
   if (!mainCamera)
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
@@ -49,7 +49,7 @@ void AnimationEngine::queueGraph(const GV3F *g, std::vector<Line> &dst) {
   }
 }
 
-void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
+void Engine::drawMesh(const TriangleMesh *mesh) {
   auto mainCamera{scene_.mainCamera()};
   if (!mainCamera)
     throw RuntimeError<SceneHasNoMainCameraSelected>{};
@@ -107,12 +107,12 @@ void AnimationEngine::drawMesh(const TriangleMesh *mesh) {
   }
 }
 
-void AnimationEngine::drawQuadMesh(const QuadMesh *mesh) {
+void Engine::drawQuadMesh(const QuadMesh *mesh) {
   auto triangleMesh{mesh->asTriangleMesh()};
   drawMesh(&triangleMesh);
 }
 
-void AnimationEngine::draw() {
+void Engine::draw() {
   std::vector<Line> lines;
   for (auto &[_, object] : scene_) {
     // cameras and lights are not drawn, so checking them here is dumb
@@ -132,7 +132,7 @@ void AnimationEngine::draw() {
   screen_.drawLines(lines.data(), lines.size());
 }
 
-void AnimationEngine::run() {
+void Engine::run() {
   auto renderThread{std::thread{[&]() {
     using namespace std::chrono;
     setup_(this);
@@ -157,20 +157,16 @@ void AnimationEngine::run() {
   renderThread.join();
 }
 
-[[nodiscard]] inline float AnimationEngine::frameRate() const {
-  return frameRate_;
-}
+[[nodiscard]] inline float Engine::frameRate() const { return frameRate_; }
 
-[[nodiscard]] float AnimationEngine::frameTime() const {
-  return 1000.0F / frameRate();
-}
+[[nodiscard]] float Engine::frameTime() const { return 1000.0F / frameRate(); }
 
-Screen &AnimationEngine::screen() { return screen_; }
+Screen &Engine::screen() { return screen_; }
 
-Camera &AnimationEngine::camera() { return *scene_.mainCamera(); }
+Camera &Engine::camera() { return *scene_.mainCamera(); }
 
-void AnimationEngine::delay(float milliseconds) { Sleep(DWORD(milliseconds)); }
+void Engine::delay(float milliseconds) { Sleep(DWORD(milliseconds)); }
 
-float AnimationEngine::deltaTime() const { return deltaTime_; }
+float Engine::deltaTime() const { return deltaTime_; }
 
 } // namespace vbag

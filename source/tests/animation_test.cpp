@@ -47,13 +47,13 @@ void testAnimations(HINSTANCE instance) {
 
   scene.setMainCamera("main_camera");
 
-  auto setupFunc = [&](vbag::AnimationEngine *engine) {
+  auto setupFunc = [&](vbag::Engine *engine) {
     lilCube.transform().scale(.5);
     lilCube.transform().translate(0, 1.5, 0);
     mainCam.transform().translate(2, 3, 10);
   };
 
-  auto loopFunc = [&](vbag::AnimationEngine *engine) {
+  auto loopFunc = [&](vbag::Engine *engine) {
     vbag::V3F acceleration{};
     vbag::V3F rotation{};
 
@@ -161,11 +161,11 @@ void testAnimations(HINSTANCE instance) {
   scene.addObject(&camera);
   scene.setMainCamera("cam");
 
-  auto setupFunc = [&](vbag::AnimationEngine *engine) {
+  auto setupFunc = [&](vbag::Engine *engine) {
     camera.transform().translate(0, 0, 6);
   };
 
-  auto loopFunc = [&](vbag::AnimationEngine *engine) {
+  auto loopFunc = [&](vbag::Engine *engine) {
     if (vbag::Input::getKey(vbag::KeyCode::W))
       camera.transform().translate(-5 * camera.transform().forward() *
                                    engine->deltaTime());
@@ -199,7 +199,7 @@ void testAnimations(HINSTANCE instance) {
   };
 #endif
 
-  vbag::D3D9Screen screen{instance, "VBAG Demo", 1280, 720};
-  vbag::AnimationEngine engine{screen, setupFunc, loopFunc, scene};
+  vbag::D3d9Screen screen{instance, "VBAG Demo", 1280, 720};
+  vbag::Engine engine{screen, setupFunc, loopFunc, scene};
   engine.run();
 }

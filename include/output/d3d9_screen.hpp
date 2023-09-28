@@ -13,8 +13,8 @@
 
 namespace vbag {
 
-class D3D9Screen;
-class AnimationEngine;
+class D3d9Screen;
+class Engine;
 
 struct Line {
   V3F start, end;
@@ -37,7 +37,7 @@ public:
 protected:
 };
 
-class D3D9Screen : public Screen {
+class D3d9Screen : public Screen {
 private:
   class Error : public std::exception {
   public:
@@ -52,7 +52,7 @@ private:
   };
 
 public:
-  explicit D3D9Screen(HINSTANCE instance, const std::string &windowTitle,
+  explicit D3d9Screen(HINSTANCE instance, const std::string &windowTitle,
                       size_t width, size_t height)
       : instance_{instance}, d3d_{Direct3DCreate9(D3D_SDK_VERSION)},
         width_{width}, height_{height} {
@@ -95,10 +95,10 @@ public:
     ShowWindow(window_, SW_SHOWDEFAULT);
   }
 
-  D3D9Screen(const D3D9Screen &) = delete;
-  D3D9Screen(D3D9Screen &&) = delete;
+  D3d9Screen(const D3d9Screen &) = delete;
+  D3d9Screen(D3d9Screen &&) = delete;
 
-  ~D3D9Screen() {
+  ~D3d9Screen() {
     DestroyWindow(window_);
     UnregisterClass(windowClassName_, instance_);
     device_->Release();

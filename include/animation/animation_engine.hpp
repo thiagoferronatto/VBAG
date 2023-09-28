@@ -15,25 +15,25 @@
 
 namespace vbag {
 
-/// @class AnimationEngine
-/// @brief The AnimationEngine class provides a framework for creating and
+/// @class Engine
+/// @brief The Engine class provides a framework for creating and
 /// animating scenes.
 ///
-/// The AnimationEngine class is responsible for managing scenes, drawing
+/// The Engine class is responsible for managing scenes, drawing
 /// elements, and controlling the animation loop. It should allow dynamic scene
 /// changes, and provides functionality for drawing lines and graphs on the
 /// screen.
-class AnimationEngine {
+class Engine {
   // TODO: add a setScene method, allowing for dynamic scene changing
 public:
   /// @brief Alias for a function pointer used in setup and loop animations.
   ///
-  /// An RenderFunc represents a function pointer that takes an AnimationEngine*
+  /// An RenderFunc represents a function pointer that takes an Engine*
   /// as an argument. It is used to define setup and loop animations for the
-  /// AnimationEngine.
-  using RenderFunc = std::function<void(AnimationEngine *)>;
+  /// Engine.
+  using RenderFunc = std::function<void(Engine *)>;
 
-  /// @brief Constructs an AnimationEngine object with the given parameters.
+  /// @brief Constructs an Engine object with the given parameters.
   ///
   /// @param screen The reference to the Screen object where the animation will
   /// be displayed.
@@ -44,7 +44,7 @@ public:
   /// @param scene The initial scene to be displayed.
   /// @param frameRate The desired frame rate for the animation (default
   /// is 60.0).
-  AnimationEngine(Screen &screen, RenderFunc setup, RenderFunc loop,
+  Engine(Screen &screen, RenderFunc setup, RenderFunc loop,
                   Scene scene, float frameRate = 60.0F);
 
   /// @brief Draws a graph on the screen.
@@ -82,13 +82,13 @@ public:
   [[nodiscard]] float frameTime() const;
 
   /// @brief Returns a reference to the Screen object associated with the
-  /// AnimationEngine.
+  /// Engine.
   ///
   /// @return Reference to the Screen object.
   [[nodiscard]] Screen &screen();
 
   /// @brief Returns a reference to the Camera object associated with the
-  /// AnimationEngine.
+  /// Engine.
   ///
   /// @return Reference to the Camera object.
   [[nodiscard]] Camera &camera();
